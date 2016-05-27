@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My Tags</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="jqcloud/jqcloud.css" />
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="jqcloud/jqcloud-1.0.4.min.js"></script>
+    <script type="text/javascript">
+      var word_list = [
+        {text: "asp.net", weight: 12},
+        {text: "C#", weight: 11},
+        {text: "MVC", weight: 8},
+        {text: "ado.net", weight: 7},
+        {text: "Entity Framework", weight: 6},
+        {text: "Linq", weight: 5},
+        {text: "webapi", weight: 4},
+        {text: "remoting", weight: 3},
+        {text: "wcf", weight: 3},
+        {text: "webservice", weight: 3},
+        {text: "silverlight", weight: 2},
+        {text: "devexpress", weight: 1},
+        {text: "windows phone", weight: 1},
+		
+        {text: "ddd", weight: 1},
+        {text: "DI", weight: 1},
+        {text: "IOC", weight: 1},
+        
+        {text: "msSql", weight: 10},
+        {text: "mySql", weight: 6},
+        {text: "Oracle", weight: 5},
+        {text: "SqlLite", weight: 4},
+        
+        {text: "java", weight: 5},
+        {text: "jsp", weight: 3},
+        {text: "javabean", weight: 1},
+        {text: "spring", weight: 1},
+        {text: "struts", weight: 1},
+        {text: "servlet", weight: 1},
+        {text: "jdbc", weight: 1},
+        {text: "android", weight: 1},
+        
+        {text: "jquery", weight: 9},
+        {text: "html/xml", weight: 7},
+        {text: "javascript", weight: 6},
+        {text: "css", weight: 5},
+        {text: "easyui", weight: 4},
+        {text: "extjs", weight: 3},
+        {text: "ligerui", weight: 3},
+        {text: "node.js", weight: 1},
+        
+        {text: "php", weight: 5},
+        {text: "vba", weight: 4},
+        {text: "vb", weight: 2},
+        {text: "lisp", weight: 1},
+        {text: "socket", weight: 2},
+        {text: "串口编程", weight: 2},
+        
+        {text: "AutoCAD二次开发", weight: 5},
+        {text: "Office二次开发", weight: 5},
+        
+        
+        {text: "redis", weight: 2},
+        {text: "MSMQ", weight: 2},
+        
+        
+        {text: "sharepoint", weight: 3},
+        {text: "photoshop", weight: 3},
+        {text: "sitecore", weight: 2}
+      ];
+      $(function() {
+        $("#my_favorite_latin_words").jQCloud(word_list);
+      });
+    </script>
+  </head>
+  <body>
+	<center>
+    <h1>My Tags</h1>
+    <div id="my_favorite_latin_words" style="width: 698px; height: 550px; border: 0px solid #ccc;"></div>
+	</center>
+  </body>
+</html>
