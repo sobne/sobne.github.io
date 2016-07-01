@@ -18,6 +18,7 @@
         {text: "remoting", weight: 3},
         {text: "wcf", weight: 3},
         {text: "webservice", weight: 3},
+        {text: "ado.net core", weight: 3},
         {text: "silverlight", weight: 2},
         {text: "devexpress", weight: 1},
         {text: "windows phone", weight: 1},
@@ -70,14 +71,47 @@
         {text: "sitecore", weight: 2}
       ];
       $(function() {
-        $("#my_favorite_latin_words").jQCloud(word_list);
+        $("#wordcloud").jQCloud(word_list);
       });
     </script>
+	<style type="text/css">
+      body {
+        background: #eee;
+        font-family: Helvetica, Arial, sans-serif;
+      }
+      #wordcloud {
+        margin: 30px auto;
+        width: 698x;
+        height: 600px;
+        border: none;
+      }
+      #wordcloud span.w10, #wordcloud span.w9, #wordcloud span.w8, #wordcloud span.w7 {
+        text-shadow: 0px 1px 1px #ccc;
+      }
+      #wordcloud span.w3, #wordcloud span.w2, #wordcloud span.w1 {
+        text-shadow: 0px 1px 1px #fff;
+      }
+      #footer {
+        font-size: 13px;
+        color: #aaa;
+        text-align: center;
+        width: 600px;
+        margin: 30px auto;
+        padding: 0.5em;
+        text-shadow: 0px 1px 1px #fff;
+        border-top: 1px dotted #ddd;
+      }
+      #footer a {
+        color: #0af;
+        text-decoration: none;
+      }
+    </style>
   </head>
   <body>
-	<center>
-    <h1>My Tags</h1>
-    <div id="my_favorite_latin_words" style="width: 698px; height: 550px; border: 0px solid #ccc;"></div>
-	</center>
+    <div id="wordcloud"></div>
+	<div id="footer">
+      <a href="#">copyright 2016all right reserved</a>
+      <strong>(<a href="#">xiaobin</a> | <a href="#">chengdu</a>)</strong>
+    </div>
   </body>
 </html>

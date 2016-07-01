@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>yellow page</title>
+<script src="dist/template.js"></script>
+</head>
+
+<body>
+<div id="content"></div>
+<script id="test" type="text/html">
+{{each region as r}}
+<h3>{{r.name}}</h3>
+<ul>
+    {{each r.list as p}}
+        <li><a href="{{p.url}}" title="{{p.title}}">{{p.name}}</a></li>
+    {{/each}}
+</ul>
+{{/each}}
+</script>
+
+<script>
+var data = {
+	"region": [
+		{"name": "全国","list":[
+			{"name": "信用中国","title": "信用中国","url":"http://www.creditchina.gov.cn/","keywords":""},
+			{"name": "中国人民银行征信中心","title": "中国人民银行征信中心","url":"http://www.pbccrc.org.cn/","keywords":""},
+			{"name": "企业信息","title": "全国企业信用信息公示系统","url":"http://gsxt.saic.gov.cn/","keywords":""},
+			{"name": "电信申诉","title": "信息产业部电信用户申诉受理中心","url":"http://www.chinatcc.gov.cn/html/mains/shensushl.html","keywords":""}
+		]},
+		{"name": "四川","list":[
+			{"name": "成都社保","title": "成都人力资源和社会保障局","url":"http://www.cdhrss.gov.cn/","keywords":""},
+			{"name": "成都公积金","title": "成都住房公积金管理中心","url":"http://www.cdzfgjj.gov.cn/","keywords":""},
+			{"name": "成都交管局","title": "成都市公安局交通管理局","url":"http://www.cdjg.gov.cn/","keywords":""},
+			{"name": "成都市长信箱","title": "成都市人民政府市长公开电话 市长信箱","url":"http://12345.chengdu.gov.cn/index","keywords":""},
+			{"name": "成都市人事考试网","title": "成都市人事考试网","url":"http://www.cdpta.gov.cn/","keywords":""},
+			{"name": "四川人事考试网","title": "四川人事考试网","url":"www.scpta.gov.cn/","keywords":""},
+			{"name": "四川汽车票务网","title": "四川汽车票务网","url":"http://www.scqcp.com/","keywords":""}
+		]},
+		{"name": "考试","list":[
+			{"name": "中国人事考试网","title": "中国人事考试网","url":"http://www.cpta.com.cn/GB/index.html","keywords":""}
+		]},
+		{"name": "交通出行","list":[
+			{"name": "汽车票务网","title": "汽车票务网","url":"http://www.12308.com/","keywords":""}
+		]},
+		{"name": "投诉举报","list":[
+			{"name": "12315消费者投诉","title": "12315在线投诉举报","url":"http://www.sgs.gov.cn/shaic/12315/jb_index.htm","keywords":""}
+			{"name": "12331食药投诉","title": "12331国家食品药品监督管理总局投诉举报中心","url":"http://www.12331.org.cn/","keywords":""}
+			{"name": "国家信访办","title": "国家投诉受理办公室","url":"http://wsxf.gjxfj.gov.cn/","keywords":""}
+		]}
+	]
+};
+var html = template('test', data);
+document.getElementById('content').innerHTML = html;
+</script>
+</body>
+</html>
