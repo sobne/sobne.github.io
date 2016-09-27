@@ -195,6 +195,7 @@ ul#skills li:after {
 	text-align: right;
 	color: #aaa;
 }
+/* 
 ul#skills li.s100:after {content: "100%";}
 ul#skills li.s90:after {content: "90%";}
 ul#skills li.s80:after {content: "80%";}
@@ -205,7 +206,7 @@ ul#skills li.s40:after {content: "40%";}
 ul#skills li.s30:after {content: "30%";}
 ul#skills li.s20:after {content: "20%";}
 ul#skills li.s10:after {content: "10%";}
-
+*/
 ul#skills li span {display: none;}
 
 ul#skills li:hover {background: #222;}
