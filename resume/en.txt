@@ -20,7 +20,7 @@
    
 > `2007.7-2012.3` | CINQ |Computers,Software | <50 people | Private Comp.
 * position：software engineer
-* description：building MIS,ERP,OA...,development for Design integration,IT support
+* description：building MIS,ERP,CRM,OA,Workflow...,development for Design integration,IT support
     
  
 ###Project Experience
