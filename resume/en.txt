@@ -9,16 +9,16 @@
 > *Conscientious、Dependably & Responsible*。Strong ability to study、analysis & Good at solving problem.
 
 ###Work Experience
-> `2014.11-Present` | MullenLowe Profero Chengdu |Computers,Software | <50 people | Foreign Comp.(Eur./N.Amer.)
-	* position：.net developer -> Tech Leader
-	* description：e-commerce website building
+> `2014.11-Present` | MullenLowe Profero Chengdu |*Computers,Software | <50 people | Foreign Comp.(Eur./N.Amer.)*
+* position：.net developer -> Tech Leader
+* description：e-commerce website building
  
-> `2012.4-2014.10` | NCS |Computers,Software | 500-1000 people | Foreign Comp.(Singapore)
-	* position：Senior Consultant
-	* description：building PWMS for Singtel,software development,provide technical assistance
-	* oversea：Yes
+> `2012.4-2014.10` | NCS |*Computers,Software | 500-1000 people | Foreign Comp.(Singapore)*
+* position：Senior Consultant
+* description：building PWMS for Singtel,software development,provide technical assistance
+* oversea：Yes
    
-> `2007.7-2012.3` | CINQ |Computers,Software | <50 people | Private Comp.
+> `2007.7-2012.3` | CINQ |*Computers,Software | <50 people | Private Comp.*
 * position：software engineer
 * description：building MIS,ERP,CRM,OA,Workflow...,development for Design integration,IT support
     
@@ -75,7 +75,7 @@
   * .NET | asp.net MVC
   * MsSql | Oracle | MySql | Sqlite | Nosql
   * HTML/CSS | javascript | jQuery | EasyUi
-  * Webservice | Wcf | Remoting
+  * Webservice | Webapi | Wcf | Remoting
   * AutoCAD | Office sencondary development
   * socket | program with serial port
   * PHP | Java | Vb/vba

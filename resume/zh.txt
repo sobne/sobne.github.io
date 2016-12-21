@@ -9,16 +9,16 @@
 > *诚信,踏实,负责*。较强的学习能力及解决问题的能力,热爱技术。
 
 ###工作经历
-> `2014.11-至今` | MullenLowe Profero Chengdu |计算机软件 | <50人 | 外企(欧美)
-	* 职位：.net developer -> Tech Leader
-	* 描述：电子商务网站建设
+> `2014.11-至今` | MullenLowe Profero Chengdu |*计算机软件 | <50人 | 外企(欧美)*
+* 职位：.net developer -> Tech Leader
+* 描述：电子商务网站建设
  
-> `2012.4-2014.10` | 成都新电信息科技 |计算机软件 | 500-1000人 | 外企(新加坡)
-	* 职位：Senior Consultant
-	* 描述：电信企业信息化系统建设,软件开发,技术支持服务
-	* 海外工作：是
+> `2012.4-2014.10` | 成都新电信息科技 |*计算机软件 | 500-1000人 | 外企(新加坡)*
+* 职位：Senior Consultant
+* 描述：电信企业信息化系统建设,软件开发,技术支持服务
+* 海外工作：是
    
-> `2007.7-2012.3` | 长沙华恒园信息科技 |计算机软件 | <50人 | 私企
+> `2007.7-2012.3` | 长沙华恒园信息科技 |*计算机软件 | <50人 | 私企*
 * 职位：软件工程师
 * 描述：中小企业信息化系统建设,MIS,ERP,CRM,OA,Workflow,设计集成系统开发,IT技术服务
     
@@ -75,7 +75,7 @@
   * .NET | asp.net MVC
   * MsSql | Oracle | MySql | Sqlite | Nosql
   * HTML/CSS | javascript | jQuery | EasyUi
-  * Webservice | Wcf | Remoting
+  * Webservice | Webapi | Wcf | Remoting
   * AutoCAD | Office 二次开发
   * 串口编程
   * PHP | Java | Vb/vba
