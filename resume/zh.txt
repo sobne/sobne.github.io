@@ -16,14 +16,20 @@
 
 * * *
 
-#### `2014.11-至今` MullenLowe Profero Chengdu
-*计算机软件 | <50人 | 外企(欧美)*
+#### `2014.12-至今` MullenLowe Profero Chengdu
+*互联网/电子商务 | 1000-5000人 | 外企(欧美)*
 
 *   职位：.net developer -> Tech Leader  
 *   描述：电子商务网站建设
    
-#### `2012.4-2014.10` 海外工作：是
-*计算机软件 | 500-1000人 | 外企(新加坡)*
+#### `2014.08-2014.12` 电子科大科园股份
+*计算机软件 | 50-150人 | 民营*
+
+*   职位：高级软件工程师  
+*   描述：四川移动管理信息系统云平台(paas)建设
+   
+#### `2012.4-2014.08` 成都新电信息
+*计算机软件 | 5000-10000人 | 外企(新加坡)*
 
 *   职位：Senior Consultant  
 *   描述：电信企业信息化系统建设,软件开发,技术支持服务  
@@ -32,7 +38,7 @@
 #### `2007.7-2012.3` 长沙华恒园信息科技
 *计算机软件 | <50人 | 私企*
 
-*   职位：软件工程师  
+*   职位：软件工程师-开发组长  
 *   描述：中小企业信息化系统建设,MIS,ERP,CRM,OA,Workflow,设计集成系统开发,IT技术服务
     
 	
@@ -53,19 +59,25 @@
   *  角色：后端开发  
   *  负责：软件设计及模块开发
    
+#### `2014.08-2014.12` 四川移动管理信息系统云平台建设(paas)
+
+  *  `asp.net mvc | webapi | remoting | sharepoint 2012 | sqlserver 2012 `
+  *  角色：高级软件工程师  
+  *  负责：平台即服务.对管理信息系统提供服务, 使用DDD架构, remoting服务, sharepoint搜索引擎实现服务接口
+   
 #### `2012.04-2014.06` 电信项目管理系统维护(PWMS)
 
   *  `asp.net webform | sharepoint 2007 | Oracle 10 `
   *  角色：高级顾问  
   *  负责：系统维护,技术支持,新需求分析及功能模块开发
    
-#### `2008.03-2012.03` 长沙冶金设计院信息管理信息系统
+#### `2008.03-2012.03` 长沙冶金设计院管理信息系统
 
   *  `asp.net webform | entity framework | mssql server 2008 | Easy ui `
   *  角色：软件工程师  
   *  负责：系统设计,软件开发及实施
    
-#### `2007.09-2008.02` 湖南建筑院信息管理信息系统
+#### `2007.09-2008.02` 湖南建筑院管理信息系统
 
   *  `asp.net webform | ado.net | mssql server 2005 `
   *  角色：软件工程师  
@@ -98,7 +110,7 @@
 ```
    .NET | asp.net MVC
    MsSql | Oracle | MySql | Sqlite | Nosql
-   HTML/CSS | javascript | jQuery | EasyUi
+   HTML/CSS | javascript | jQuery | EasyUi | node.js
    Webservice | Webapi | Wcf | Remoting
    AutoCAD | Office 二次开发
    socket | 串口编程

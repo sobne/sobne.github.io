@@ -16,14 +16,20 @@
 
 * * *
 
-#### `2014.11-Present` MullenLowe Profero Chengdu
-*Computers,Software | <50 people | Foreign Comp.(Eur./N.Amer.)*
+#### `2014.12-Present` MullenLowe Profero Chengdu
+*Internet/E-commerce | 1000-5000 people | Foreign Comp.(Eur./N.Amer.)*
 
 *   position：.net developer -> Tech Leader  
 *   description：e-commerce website building
    
-#### `2012.4-2014.10` NCS
-*Computers,Software | 500-1000 people | Foreign Comp.(Singapore)*
+#### `2014.08-2014.12` CORELAND
+*Computers,Software | 50-150 people | Private Comp.*
+
+*   position：Senior Software Engineer  
+*   description：paas for SCMCC
+   
+#### `2012.4-2014.08` NCS
+*Computers,Software | 5000-10000 people | Foreign Comp.(Singapore)*
 
 *   position：Senior Consultant  
 *   description：building PWMS for Singtel,software development,provide technical assistance  
@@ -52,6 +58,12 @@
   *  `asp.net mvc4 | sitecore7.5 | mssql server 2012 `
   *  role：back-end developer  
   *  major：requierment analysis, design & development
+   
+#### `2014.08-2014.12` paas for SCMCC
+
+  *  `asp.net mvc | webapi | remoting | sharepoint 2012 | sqlserver 2012 `
+  *  role：Senior Software Engineer  
+  *  major：system maintenance & development
    
 #### `2012.04-2014.06` Singtel(PWMS) System Technology Support
 
@@ -98,7 +110,7 @@
 ```
    .NET | asp.net MVC
    MsSql | Oracle | MySql | Sqlite | Nosql
-   HTML/CSS | javascript | jQuery | EasyUi
+   HTML/CSS | javascript | jQuery | EasyUi | node.js
    Webservice | Webapi | Wcf | Remoting
    AutoCAD | Office sencondary development
    socket | program with serial port
