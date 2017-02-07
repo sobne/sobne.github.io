@@ -22,26 +22,26 @@
 *Internet/E-commerce | 1000-5000 people | Foreign Comp.(Eur./N.Amer.)*
 
 *   position：.net developer -> Tech Leader  
-*   description：e-commerce website building
+*   description：[medical,hotel]e-commerce website building
    
 #### `Aug 2014-Dec 2014` CORELAND
 *Computers,Software | 50-150 people | Private Comp.*
 
 *   position：Senior Software Engineer  
-*   description：paas of MIS for SCMCC
+*   description：[mobile communication]paas of MIS for SCMCC
    
 #### `Apr 2012-Aug 2014` NCS
 *Computers,Software | 5000-10000 people | Foreign Comp.(Singapore)*
 
 *   position：Senior Consultant  
-*   description：building PWMS for Singtel,software development,provide technical assistance  
+*   description：[telecommunication]building PWMS for Singtel,software development,provide technical assistance  
 *   oversea：Yes
    
 #### `Jul 2007-Mar 2012` CINQ
 *Computers,Software | <50 people | Private Comp.*
 
 *   position：software engineer  
-*   description：building MIS,ERP,CRM,OA,Workflow...,development for Design integration,IT support
+*   description：[building,design]building MIS,ERP,CRM,OA,Workflow...,development for Design integration,IT support
     
 	
 
@@ -51,7 +51,7 @@
 
 #### `Sep 2015-Present` millennium hotel website
 
-  *  `asp.net mvc4 | sitecore8 | mssql server 2014 `  
+  *  `asp.net mvc4 | webapi | sitecore8 | mssql server 2014 `  
   *  desc：e-commerce website building, include order,membership,ticket...  
   *  role：TL - system architeckture, requierment analysis, design & development  
    
@@ -63,7 +63,7 @@
    
 #### `Aug 2014-Dec 2014` paas for SCMCC
 
-  *  `asp.net mvc | webapi | remoting | sharepoint 2012 | sqlserver 2012 `
+  *  `asp.net mvc | MSMQ | remoting | sharepoint 2012 | sqlserver 2012 `
   *  desc：develop service for MIS by using DDD.  
   *  role：Senior Software Engineer - system maintenance & development
    
