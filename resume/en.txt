@@ -97,6 +97,7 @@
     - 0731piao,tomoom  
   - lotteryradar:software of data analysis for caipiao  
   - piaojuyi:wechat public account  
+  - hardware:security door system for bank  
   - open-source project  
    
 
