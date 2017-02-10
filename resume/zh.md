@@ -22,7 +22,7 @@
 #### `2014.12-至今` MullenLowe Profero Chengdu
 *互联网/电子商务 | 1000-5000人 | 外企(欧美)*
 
-*   职位：.net developer -> Tech Leader  
+*   职位：Senior .net developer -> Tech Leader  
 *   描述：[医药,酒店]电子商务网站建设
    
 #### `2014.08-2014.12` 电子科大科园股份
@@ -74,23 +74,18 @@
   *  描述：基于sharepoint的工作流信息系统, 主要包含项目管理系统和费用管理系统。  
   *  角色：高级顾问 - 系统维护,技术支持,新需求分析及功能模块开发
    
-#### `2008.03-2012.03` 长沙冶金设计院管理信息系统
+#### `2007.09-2012.03` 企业信息化管理系统建设
 
-  *  `asp.net webform | EF | mssql server 2008 | Easy ui `
-  - 描述：企业信息化管理系统建设，工程设计集成系统研发,主要包含的系统有:  
+  *  `asp.net webform | ado.net/EF | mssql server 2005/2008 | Easy ui `
+  - 描述：产品研发,主要客户(湖南省建筑设计院,长沙冶金设计院,桂林设计院等)。 企业信息化管理系统建设，工程设计集成系统研发,主要包含的系统有:  
     - 企业知识库(标准规范)系统  
-    - 绩效考核管理系统  
-    - 设计集成管理系统（AutoCAD二次开发）  
+    - 绩效考核系统  
+    - 设计集成系统（AutoCAD二次开发）  
     - 档案管理信息系统  
     - 项目管理系统  
     - ERP,CRM,OA  
-  - 角色：软件工程师 - 系统设计,软件开发及实施
+  - 角色：软件工程师 - 产品研发,系统设计,软件开发及实施
    
-#### `2007.09-2008.02` 湖南建筑院管理信息系统
-
-  *  `asp.net webform | ado.net | mssql server 2005 `
-  *  描述：项目管理系统, 设计集成系统, 绩效考核系统, OA  
-  *  角色：软件工程师 - 系统设计,软件开发及实施
    
 > #### 其他项目 `全栈`  
   - 网站管理系统 
@@ -120,7 +115,7 @@
 ```
    .NET | asp.net MVC
    MsSql | Oracle | MySql | Sqlite | Nosql
-   HTML/CSS | javascript | jQuery | EasyUi | node.js
+   HTML/CSS | javascript | jQuery | EasyUi | nodejs
    Webservice | Webapi | Wcf | Remoting
    AutoCAD | Office 二次开发
    socket | 串口编程

@@ -21,7 +21,7 @@
 #### `Dec 2014-Present` MullenLowe Profero Chengdu
 *Internet/E-commerce | 1000-5000 people | Foreign Comp.(Eur./N.Amer.)*
 
-*   position：.net developer -> Tech Leader  
+*   position：Senior .net developer -> Tech Leader  
 *   description：[medical,hotel]e-commerce website building
    
 #### `Aug 2014-Dec 2014` CORELAND
@@ -73,23 +73,18 @@
   *  desc：Workflow system based on sharepoint, include project management & costing management.  
   *  role：Senior Consultant - system maintenance,technical assistance,requierment analysis, design & development
    
-#### `Mar 2008-Mar 2012` Management Information System(cinf)
+#### `Sep 2007-Mar 2012` Management Information System(cinf)
 
-  *  `asp.net webform | entity framework | mssql server 2008 | Easy ui `
-  - desc：Enterprise MIS, Design integration system, include: 
+  *  `asp.net webform | ado.net/entity framework | mssql server 2005/2008 | Easy ui `
+  - desc：Product development,Enterprise MIS, Design integration system, include: 
     - knowledge base system
     - KPI system
-    - design integration system
+    - design integration system(AutoCAD)
     - project management system
     - file management system
     - ERP,CRM,OA
   - role：software engineer - system design,software development&tech-support
    
-#### `Sep 2007-Feb 2008` Management Information System(hnjy)
-
-  *  `asp.net webform | ado.net | mssql server 2005 `
-  *  desc：project management, design integration system , KPI system, OA...  
-  *  role：software engineer - system design,software development&tech-support
    
 > #### other project `full-stack`  
   - website management system  
@@ -119,7 +114,7 @@
 ```
    .NET | asp.net MVC
    MsSql | Oracle | MySql | Sqlite | Nosql
-   HTML/CSS | javascript | jQuery | EasyUi | node.js
+   HTML/CSS | javascript | jQuery | EasyUi | nodejs
    Webservice | Webapi | Wcf | Remoting
    AutoCAD | Office sencondary development
    socket | program with serial port
