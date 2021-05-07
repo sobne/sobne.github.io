@@ -9,8 +9,8 @@
   长沙理工大学 | 计算机科学与技术 | 统招/本科/学士 
     
 
-> **软件设计师** , 9年软件行业经验  
-> 专注系统架构,软件设计和程序开发。  
+> **软件设计师** , 工程师(中级职称)。10年+软件行业经验  
+> 专注系统架构,软件工程全生命周期。拥有自主知识产权独立研发软件产品3项(**Xcms内容管理系统**,**应用集软件**,**android微应用**)。  
 > *诚信,踏实,负责*,良好的沟通能力和团队协作精神。
 > 较强的学习能力及解决问题的能力,具有专研敬业精神.热爱技术。
 
@@ -19,7 +19,13 @@
 
 * * *
 
-#### `2014.12-至今` MullenLowe Profero Chengdu
+#### `2017.4-至今` 民航成都物流技术有限公司
+*公共服务/民航 | 100-500人 | 国企*
+
+*   职位：IT工程师  
+*   描述：[民航机场]行李系统工程项目建设
+
+#### `2014.12-2017.4` MullenLowe Profero Chengdu
 *互联网/电子商务 | 1000-5000人 | 外企(欧美)*
 
 *   职位：Senior .net developer -> Tech Leader  
@@ -113,13 +119,14 @@
    
 ### IT技能  
 ```
-   .NET | asp.net MVC
-   MsSql | Oracle | MySql | Sqlite | Nosql
+   .NET(core) | asp.net MVC | wpf
+   MsSql | Oracle | MySql | Sqlite | Nosql(redis) | RabbitMQ
    HTML/CSS | javascript | jQuery | EasyUi | nodejs
-   Webservice | Webapi | Wcf | Remoting
+   Webservice | Webapi | Wcf | Remoting | ApiGateway
    AutoCAD | Office 二次开发
-   socket | 串口编程
+   socket | websocket | 串口编程
    PHP | Java | Vb/vba
+   testing | Jmeter
 ```
    
 
