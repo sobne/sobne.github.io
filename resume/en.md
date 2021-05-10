@@ -9,7 +9,7 @@
   CSUST | Computer Science And Technology | Tongzhao - Degree - Bachelor
 
 > **Advanced Programmer** 10+ years experience in software development(.NET)  
-> Professional in system architeckture,software design & program devemlopment.  
+> Professional in system architeckture,software design & program devemlopment.owned Independent R&D Software Copyright`[Xcms(mvc)],[Xappsets(wpf)],[Xapp(android)]} `  
 > *Conscientious、Dependably & Responsible*.
 > Strong ability to study、analysis & Good at solving problem.
 
