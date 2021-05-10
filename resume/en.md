@@ -1,5 +1,5 @@
 ﻿
-[查看中文版本](https://sobne.github.io/zh)
+[查看中文版本](https://sobne.github.io/resume/zh)
     
 	
 
@@ -8,7 +8,7 @@
   Male(*1983.10*) | 18202879957 | sobne@qq.com 
   CSUST | Computer Science And Technology | Tongzhao - Degree - Bachelor
 
-> **Advanced Programmer** 9 years experience in software development(.NET)  
+> **Advanced Programmer** 10+ years experience in software development(.NET)  
 > Professional in system architeckture,software design & program devemlopment.  
 > *Conscientious、Dependably & Responsible*.
 > Strong ability to study、analysis & Good at solving problem.
@@ -18,7 +18,10 @@
 
 * * *
 
-#### `Dec 2014-Present` MullenLowe Profero Chengdu
+#### `Apr 2017-Present` Civil Aviation Logistics Technology Co.,Ltd
+*Civil Aviation/Airport | 100-500 people | SOE Comp.*
+
+#### `Dec 2014-Apr 2017` MullenLowe Profero Chengdu
 *Internet/E-commerce | 1000-5000 people | Foreign Comp.(Eur./N.Amer.)*
 
 *   position：Senior .net developer -> Tech Leader  
@@ -49,7 +52,13 @@
 
 * * *
 
-#### `Sep 2015-Present` millennium hotel website
+#### `Apr 2017-Present` Baggage Management System
+
+  *  `asp.net mvc4 | websocket | socket | android | mssql server 2016`  
+  *  desc：Civil Aviation Baggage management system, include sorting,tracking,self bag drop etc...  
+  *  role：Engineer - product design,project management & engineering construction 
+   
+#### `Sep 2015-Apr 2017` millennium hotel website
 
   *  `asp.net mvc4 | webapi | sitecore8 | mssql server 2014 `  
   *  desc：e-commerce website building, include order,membership,ticket...  
@@ -104,6 +113,10 @@
 ### Awards  
 > #### Certifications  
    *  Advanced Programer
+   *  Engineer(medium-grade professional)
+   *  Software Copyright
+> #### Career  
+   *  Outstanding staff | Advanced worker
   
 ### Language  
 > #### English  
@@ -112,13 +125,14 @@
    
 ### IT Skills  
 ```
-   .NET | asp.net MVC
-   MsSql | Oracle | MySql | Sqlite | Nosql
+   .NET(core) | asp.net MVC | wpf
+   MsSql | Oracle | MySql | Sqlite | Nosql(redis) | RabbitMQ
    HTML/CSS | javascript | jQuery | EasyUi | nodejs
-   Webservice | Webapi | Wcf | Remoting
+   Webservice | Webapi | Wcf | Remoting | ApiGateway
    AutoCAD | Office sencondary development
-   socket | program with serial port
-   PHP | Java | Vb/vba
+   IOT | socket | websocket | program with serial port
+   PHP | Java | Android | Vb/vba
+   testing | Jmeter
 ```
    
 
