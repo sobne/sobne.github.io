@@ -6,3 +6,6 @@
 ### View By ZH-CN
 [查看中文版本](https://sobne.github.io/resume/zh)
 
+
+## version
+last updated: 2025

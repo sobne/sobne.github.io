@@ -1,5 +1,5 @@
 ﻿
-[查看中文版本](https://sobne.github.io/resume/zh)
+[查看中文版本](https://sobne.gitee.io/resume/zh)
     
 	
 
@@ -8,8 +8,8 @@
   Male(*1983.10*) | 18202879957 | sobne@qq.com 
   CSUST | Computer Science And Technology | Tongzhao - Degree - Bachelor
 
-> **Advanced Programmer** 10+ years experience in software development(.NET)  
-> Professional in system architeckture,software design & program devemlopment.owned Independent R&D Software Copyright`[Xcms(mvc)],[Xappsets(wpf)],[Xapp(android)]} `  
+> **ISPM** . **Advanced Programmer** 10+ years experience in software development(.NET)  
+> Professional in system architeckture,software design & program devemlopment. own Independent R&D Software Copyright`[Xcms(mvc)],[Xappsets(wpf)],[Xapp(android)]} ` 
 > *Conscientious、Dependably & Responsible*.
 > Strong ability to study、analysis & Good at solving problem.
 
@@ -112,6 +112,7 @@
 
 ### Awards  
 > #### Certifications  
+   *  ISPM
    *  Advanced Programer
    *  Engineer(medium-grade professional)
    *  Software Copyright
@@ -125,13 +126,13 @@
    
 ### IT Skills  
 ```
-   .NET(core) | asp.net MVC | wpf
+   .NET(core) | asp.net MVC | wpf | Micro Service
    MsSql | Oracle | MySql | Sqlite | Nosql(redis) | RabbitMQ
    HTML/CSS | javascript | jQuery | EasyUi | nodejs
    Webservice | Webapi | Wcf | Remoting | ApiGateway
    AutoCAD | Office sencondary development
    IOT | socket | websocket | program with serial port
-   PHP | Java | Android | Vb/vba
+   PHP | Java | Spring Cloud | Android | Vb/vba
    testing | Jmeter
 ```
    
@@ -149,6 +150,4 @@
 
  :e-mail:
  :phone:
-
-
 
