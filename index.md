@@ -8,4 +8,4 @@
 
 
 ## version
-last updated: 2025
+copyright@2025
