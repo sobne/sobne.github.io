@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQTT Web客户端</title>
+	<!--
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+	-->
+	<link rel="stylesheet" href="css/all.min.css">
+    <script src="mqtt.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #1a1a2e;
+            color: #e6e6e6;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container-header {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+			padding-bottom:10px;
+        } 
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 20px;
+        }
+        
+        @media (max-width: 1024px) {
+			.connection-form {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+		
+        /* 连接配置顶部容器 */
+        .connection-header {
+            width: 100%;
+            background-color: #16213e;
+            border-radius: 12px;
+            padding: 10px 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid #30475e;
+        }
+        
+        .connection-header .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #30475e;
+            padding-bottom: 15px;
+        }
+        
+        /* 连接配置水平布局 */
+        .connection-form {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 20px;
+            align-items: end;
+        }
+        
+        .card {
+            background-color: #16213e;
+            border-radius: 12px;
+            padding: 10px 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid #30475e;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #30475e;
+            padding-bottom: 15px;
+        }
+        
+        .card-header i {
+            margin-right: 10px;
+            font-size: 1.5rem;
+            color: #4cc9f0;
+        }
+        
+        h1, h2, h3 {
+            color: #4cc9f0;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #f72585;
+        }
+        
+        .status {
+            display: flex;
+			text-align: center;
+			align-items: center;
+			justify-content: center;
+			margin: 0 auto 10px auto;
+			width: 100%;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .connected {
+            background-color: #4ade80;
+            box-shadow: 0 0 10px #4ade80;
+        }
+        
+        .disconnected {
+            background-color: #f87171;
+            box-shadow: 0 0 10px #f87171;
+        }
+        
+        .form-group {
+            margin-bottom: 10px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #a5b4cb;
+        }
+        
+        input, select, textarea, button {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #30475e;
+            background-color: #0f3460;
+            color: #e6e6e6;
+            font-size: 1rem;
+        }
+        
+        textarea {
+            font-family: monospace;
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        input:focus, select:focus, textarea:focus, button:focus {
+            outline: none;
+            border-color: #4cc9f0;
+            box-shadow: 0 0 0 2px rgba(76, 201, 240, 0.2);
+        }
+        
+        button {
+            background-color: #4361ee;
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        button:hover {
+            background-color: #3a56d4;
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button i {
+            margin-right: 8px;
+        }
+        
+        .btn-connect {
+            background-color: #4ade80;
+        }
+        
+        .btn-connect:hover {
+            background-color: #22c55e;
+        }
+        
+        .btn-disconnect {
+            background-color: #f87171;
+        }
+        
+        .btn-disconnect:hover {
+            background-color: #ef4444;
+        }
+        
+        .btn-publish {
+            background-color: #f59e0b;
+        }
+        
+        .btn-publish:hover {
+            background-color: #d97706;
+        }
+		
+		.lbl-sub-topic {
+			font-weight: 600;
+			color: #a5b4cb;
+			padding: 12px 2px;
+		}
+        
+        .btn-subscribe {
+            background-color: #8b5cf6;
+        }
+        
+        .btn-subscribe:hover {
+            background-color: #7c3aed;
+        }
+        
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            background-color: #0f3460;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            border: 1px solid #30475e;
+            min-height: 400px;
+            max-height: 500px;
+			scrollbar-width: thin;
+			scrollbar-color: #4cc9f0 #0f3460;
+        }
+		.messages-container::-webkit-scrollbar {
+			width: 6px;
+		}
+		.messages-container::-webkit-scrollbar-track {
+			background: #0f3460;
+			border-radius: 3px;
+		}
+		.messages-container::-webkit-scrollbar-thumb {
+			background: linear-gradient(180deg, #4cc9f0, #3aadd9);
+			border-radius: 3px;
+			border: 1px solid #30475e;
+		}
+		.messages-container::-webkit-scrollbar-thumb:hover {
+			background: linear-gradient(180deg, #3aadd9, #2a9dbb);
+		}
+		.messages-container::-webkit-scrollbar-thumb:active {
+			background: linear-gradient(180deg, #2a9dbb, #1a8da9);
+		}
+        
+        /* 消息项 - 两列布局 */
+        .message-item {
+            display: flex;
+            padding: 6px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background-color: #1e3a8a;
+            border-left: 4px solid #4cc9f0;
+        }
+        
+        /* 时间列 - 固定宽度 */
+        .message-time-col {
+            width: 70px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 2px;
+        }
+        
+        .message-time {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            text-align: center;
+            line-height: 1.4;
+        }
+        
+        /* 内容列 - 自适应宽度 */
+        .message-content-col {
+            flex: 1;
+            min-width: 0; /* 防止内容溢出 */
+        }
+        
+        .message-topic {
+            font-weight: 600;
+            color: #a78bfa;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+		.message-topic.received {
+			justify-content: flex-start;
+        }
+		.message-topic.sent {
+			justify-content: flex-end;
+        }
+		.sent span {
+		  margin-left: auto;
+		}
+        
+        /* 消息内容容器 */
+        .message-content-container {
+            margin-top: 5px;
+        }
+        /* 消息 */
+        .message-content {
+            text-align: left;
+            padding: 0px 15px;
+            border-radius: 8px;
+            color: #e6e6e6;
+            word-break: break-word;
+            font-family: monospace;
+            max-width: 80%;
+			padding: 10px;
+        }
+        /* 接收消息 - 左对齐 */
+        .message-content.received {
+            background-color: #0f3460;
+            border: 1px solid #30475e;
+        }        
+        /* 发送消息 - 右对齐 */
+        .message-content.sent {
+            background-color: #1e3a8a;
+            border: 1px solid #4361ee;
+            text-align: right;
+            margin-left: auto;
+        }        
+        /* 系统消息 - 居中 */
+        .message-content.system {
+            background-color: #3730a3;
+            border: 1px solid #8b5cf6;
+        }
+        
+        .message-type-in {
+            background-color: #4ade80;
+        }
+        
+        .message-type-out {
+            background-color: #f59e0b;
+        }
+        
+        .message-type-system {
+            background-color: #8b5cf6;
+        }
+        
+        .subscriptions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .subscriptions-list {
+            flex: 1;
+            overflow-y: hidden; /* 默认隐藏滚动条 */
+            margin-top: 10px;
+            padding-right: 5px;
+        }
+        
+        /* 鼠标悬停时显示滚动条 */
+        .subscriptions-list:hover {
+            overflow-y: auto;
+        }
+        
+        /* 自定义滚动条样式 */
+        .subscriptions-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .subscriptions-list::-webkit-scrollbar-track {
+            background: #0f3460;
+            border-radius: 3px;
+        }
+        
+        .subscriptions-list::-webkit-scrollbar-thumb {
+            background: #4cc9f0;
+            border-radius: 3px;
+        }
+        
+        .subscriptions-list::-webkit-scrollbar-thumb:hover {
+            background: #3aadd9;
+        }
+        
+        .subscriptions-list {
+			flex: 1;
+			overflow-y: hidden; /* 默认隐藏滚动条 */
+			padding-top: 1px;
+			padding-right: 5px;
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+			grid-gap: 10px;
+			max-height: 250px;
+		}
+		.subscriptions-list:hover {
+			overflow-y: auto;
+		}
+        
+		.subscription-item {
+			display: flex;
+			flex-direction: column;
+			padding: 10px;
+			background-color: #1e3a8a;
+			border-radius: 8px;
+			border: 1px solid #30475e;
+			cursor: pointer;
+			transition: all 0.2s ease;
+			min-height: 80px;
+			max-height: 100px;
+			overflow: hidden;
+		}
+        .subscription-item:hover {
+            background-color: #1e40af;
+			transform: translateY(-1px);
+        }
+        
+        .subscription-item.active {
+            background-color: #3730a3;
+            border-color: #4cc9f0;
+        }
+        
+        .subscription-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0; /* 防止内容溢出 */
+        }
+        
+        .subscription-topic {
+            font-weight: 600;
+			color: #a78bfa;
+			word-break: break-all;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			display: flex;
+			justify-content: space-between;
+			font-size: 0.9rem;
+        }
+        .subscription-topic-x {
+            display: flex;
+			align-items: center;
+			font-size: 0.75rem;
+        }
+        
+        .subscription-stats {
+            font-size: 0.8rem;
+			color: #94a3b8;
+			display: flex;
+			justify-content: space-between;
+			margin-top: auto;
+        }
+        
+        .subscription-stat {
+            display: flex;
+			align-items: center;
+			font-size: 0.75rem;
+        }
+        
+        .subscription-stat i {
+            margin-right: 3px;
+        }
+        
+        .btn-unsubscribe {
+            background-color: #f87171;
+			padding: 3px 1px 3px 6px;
+			font-size: 0.8rem;
+			width: auto;
+			align-self: flex-end;
+        }
+        
+        .clear-btn {
+            background-color: #6b7280;
+            margin-top: 10px;
+        }
+        
+        .clear-btn:hover {
+            background-color: #4b5563;
+        }
+        
+        .message-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .filter-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-left: auto;
+        }
+        
+        .filter-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .filter-checkbox input {
+            width: auto;
+        }
+        
+        .stats-badge {
+            background-color: #4361ee;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+        
+        .log-type-in {
+            border-left-color: #4ade80;
+        }
+        
+        .log-type-out {
+            border-left-color: #f59e0b;
+        }
+        
+        .log-type-system {
+            border-left-color: #8b5cf6;
+        }
+        
+        .empty-message {
+            text-align: center;
+			color: #94a3b8;
+			padding: 20px;
+			font-style: italic;
+			grid-column: 1 / -1;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .active-filter {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            background-color: #1e3a8a;
+            border-radius: 8px;
+            border: 1px solid #4cc9f0;
+        }
+        
+        .active-filter span {
+            margin-right: 10px;
+        }
+        
+        .clear-filter-btn {
+            background-color: #6b7280;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            width: auto;
+        }
+        
+        .message-source {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            background-color: #0f3460;
+            padding: 2px 8px;
+            border-radius: 10px;
+            border: 1px solid #30475e;
+        }
+        
+    </style>
+</head>
+<body>
+    <h1><i class="fas fa-satellite-dish"></i> MQTT Web客户端</h1>
+    
+	<div class="container-header">
+		<!-- 顶部：连接配置（水平布局） -->
+        <div class="connection-header">
+            <div class="card-header">
+                <i class="fas fa-plug"></i>
+                <h2>连接配置</h2>
+            </div>
+            <div class="connection-form">
+                <div class="form-group">
+                    <label for="brokerUrl">MQTT代理地址</label>
+                    <select id="brokerUrl">
+                        <option value="wss://broker.emqx.io:8084/mqtt">EMQX公共服务器 (wss://broker.emqx.io:8084/mqtt)</option>
+                        <option value="ws://broker.emqx.io:8083/mqtt">EMQX公共服务器 (ws://broker.emqx.io:8083/mqtt)</option>
+                        <option value="wss://test.mosquitto.org:8081">Mosquitto测试服务器 (wss://test.mosquitto.org:8081)</option>
+                        <option value="ws://localhost:9001">本地服务器 (ws://localhost:9001)</option>
+                        <option value="custom">自定义地址</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="customUrlContainer" style="display: none;">
+                    <label for="customUrl">自定义代理地址</label>
+                    <input type="text" id="customUrl" placeholder="例如: ws://broker.example.com:9001">
+                </div>
+                
+                <div class="form-group">
+                    <label for="clientId">客户端ID</label>
+                    <input type="text" id="clientId" value="mqtt_web_client_" placeholder="客户端标识">
+                </div>
+                
+				<div class="form-group">
+					<button class="btn-connect" id="connectDisconnectBtn" style="height: 46px;">
+						<i class="fas fa-link"></i> 连接
+					</button>
+				</div>
+            </div>
+            
+        </div>
+	</div>
+	
+			<div class="status" style ="width:100px;">
+                <div class="status-indicator disconnected" id="statusIndicator"></div>
+                <span id="statusText">未连接</span>
+            </div>
+	
+    <div class="container">
+        <!-- 左侧：连接配置和发送消息 -->
+        <div>
+            
+            <!-- 发布消息 -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-paper-plane"></i>
+                    <h2>发布</h2>
+                </div>
+                
+                <div class="form-group">
+					<div style="display: flex; gap: 10px;">
+						<span class ="lbl-sub-topic">主题:</span>
+						<input type="text" id="publishTopic" placeholder="例如: home/livingroom/temperature" value="test/topic" style="flex: 1;">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="publishMessage">消息内容</label>
+                    <textarea id="publishMessage" rows="4" placeholder="输入要发布的消息...">Hello MQTT!</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="qos">QoS级别</label>
+                    <select id="qos">
+                        <option value="0">0 - 最多一次</option>
+                        <option value="1">1 - 至少一次</option>
+                        <option value="2">2 - 仅一次</option>
+                    </select>
+                </div>
+                
+                <button class="btn-publish" id="publishBtn">
+                    <i class="fas fa-paper-plane"></i> 发布消息
+                </button>
+            </div>
+        </div>
+        
+        <!-- 右侧：订阅和接收消息 -->
+        <div>
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-bell"></i>
+                    <h2>订阅</h2>
+                </div>
+                
+                <div class="form-group">
+                    <div style="display: flex; gap: 10px;">
+						<span class ="lbl-sub-topic">主题:</span>
+                        <input type="text" id="subscribeTopic" placeholder="例如: home/#" value="test/#" style="flex: 1;">
+                        <button class="btn-subscribe" id="subscribeBtn" style="width: auto; padding: 12px 20px;">
+                            <i class="fas fa-plus-circle"></i> 订阅
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="subscriptions-list" id="subscriptionsContainer">
+                    <div class="empty-message">暂无订阅主题</div>
+                </div>
+            </div>
+            
+            <!-- 消息日志 -->
+            <div class="card">
+                <div class="message-header">
+                    <div class="card-header" style="margin-bottom: 0; border-bottom: none; padding-bottom: 0;">
+                        <i class="fas fa-list-alt"></i>
+                        <h2>消息记录</h2>
+                    </div>
+                    
+                    <div class="filter-controls">
+                        <label class="filter-checkbox">
+                            <input type="checkbox" id="showSentMessages" checked> 
+                            <span>显示发送消息</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" id="showReceivedMessages" checked> 
+                            <span>显示接收消息</span>
+                        </label>
+                        <div class="stats-badge" id="totalMessagesCount">0</div>
+                    </div>
+                </div>
+                
+                <div id="activeFilterContainer" style="display: none;">
+                    <div class="active-filter">
+                        <span>当前筛选: <strong id="currentFilterTopic"></strong></span>
+                        <button class="clear-filter-btn" id="clearFilterBtn">
+                            <i class="fas fa-times"></i> 清除筛选
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="messages-container" id="messagesContainer">
+                    <div class="message-item log-type-system">
+                        <div class="message-time-col">
+                            <div class="message-time">就绪</div>
+                        </div>
+                        <div class="message-content-col">
+                            <div class="message-topic">
+                                <span>系统信息</span>
+                                <span class="message-source">系统</span>
+                            </div>
+                            <div class="message-content-container">
+                                <div class="message-content system">
+									MQTT Web客户端已就绪。请连接到MQTT代理开始使用。
+								</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="clear-btn" id="clearMessagesBtn">
+                    <i class="fas fa-trash-alt"></i> 清空消息
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>MQTT Web客户端 - 使用MQTT.js库 | 支持WebSocket连接 | 兼容大多数MQTT 3.1.1代理</p>
+    </div>
+
+    <script>
+        // MQTT客户端变量
+        let mqttClient = null;
+        let isConnected = false;
+        let subscriptions = new Map(); // 使用Map存储订阅主题及其消息统计
+        let allMessages = []; // 存储所有消息
+        let currentFilter = {
+            topic: null,
+            showSent: true,
+            showReceived: true
+        };
+        
+        // DOM元素
+        const statusIndicator = document.getElementById('statusIndicator');
+        const statusText = document.getElementById('statusText');
+        const totalMessagesCountElement = document.getElementById('totalMessagesCount');
+        const brokerUrlSelect = document.getElementById('brokerUrl');
+        const customUrlContainer = document.getElementById('customUrlContainer');
+        const customUrlInput = document.getElementById('customUrl');
+        const clientIdInput = document.getElementById('clientId');
+        const connectDisconnectBtn = document.getElementById('connectDisconnectBtn');
+        const publishTopicInput = document.getElementById('publishTopic');
+        const publishMessageInput = document.getElementById('publishMessage');
+        const qosSelect = document.getElementById('qos');
+        const publishBtn = document.getElementById('publishBtn');
+        const subscribeTopicInput = document.getElementById('subscribeTopic');
+        const subscribeBtn = document.getElementById('subscribeBtn');
+        const subscriptionsContainer = document.getElementById('subscriptionsContainer');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const clearMessagesBtn = document.getElementById('clearMessagesBtn');
+        const showSentMessagesCheckbox = document.getElementById('showSentMessages');
+        const showReceivedMessagesCheckbox = document.getElementById('showReceivedMessages');
+        const activeFilterContainer = document.getElementById('activeFilterContainer');
+        const currentFilterTopicElement = document.getElementById('currentFilterTopic');
+        const clearFilterBtn = document.getElementById('clearFilterBtn');
+        
+        // 生成随机客户端ID
+        function generateClientId() {
+            const randomSuffix = Math.random().toString(36).substring(2, 8);
+            return `mqtt_web_client_${randomSuffix}`;
+        }
+        
+        // 初始化客户端ID
+        clientIdInput.value = generateClientId();
+        
+        // 自定义URL选择处理
+        brokerUrlSelect.addEventListener('change', function() {
+            if (this.value === 'custom') {
+                customUrlContainer.style.display = 'block';
+            } else {
+                customUrlContainer.style.display = 'none';
+            }
+        });
+        
+        // 连接/断开连接按钮
+        connectDisconnectBtn.addEventListener('click', function() {
+            if (isConnected) {
+                disconnectFromBroker();
+            } else {
+                connectToBroker();
+            }
+        });
+        
+        // 发布消息
+        publishBtn.addEventListener('click', publishMessage);
+        
+        // 订阅主题
+        subscribeBtn.addEventListener('click', subscribeToTopic);
+        
+        // 清空消息
+        clearMessagesBtn.addEventListener('click', clearMessages);
+        
+        // 消息过滤控制
+        showSentMessagesCheckbox.addEventListener('change', filterMessages);
+        showReceivedMessagesCheckbox.addEventListener('change', filterMessages);
+        
+        // 清除筛选
+        clearFilterBtn.addEventListener('click', clearTopicFilter);
+        
+        // 连接函数
+        function connectToBroker() {
+            // 获取连接参数
+            let brokerUrl = brokerUrlSelect.value;
+            if (brokerUrl === 'custom') {
+                brokerUrl = customUrlInput.value.trim();
+                if (!brokerUrl) {
+                    addSystemMessage('请输入自定义代理地址');
+                    return;
+                }
+            }
+            
+            const clientId = clientIdInput.value.trim() || generateClientId();
+            
+            // 更新UI状态
+            updateConnectionStatus('连接中...', 'disconnected');
+            connectDisconnectBtn.disabled = true;
+            connectDisconnectBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 连接中...';
+            
+            // 添加系统消息
+            addSystemMessage(`正在连接到 ${brokerUrl}...`);
+            
+            // 设置MQTT连接选项
+            const options = {
+                clientId: clientId,
+                clean: true,
+                reconnectPeriod: 1000,
+                connectTimeout: 30 * 1000,
+            };
+            
+            try {
+                // 创建MQTT客户端
+                mqttClient = mqtt.connect(brokerUrl, options);
+                
+                // 连接成功
+                mqttClient.on('connect', function() {
+                    isConnected = true;
+                    updateConnectionStatus('已连接', 'connected');
+                    connectDisconnectBtn.disabled = false;
+                    connectDisconnectBtn.innerHTML = '<i class="fas fa-unlink"></i> 断开连接';
+                    connectDisconnectBtn.className = 'btn-disconnect';
+                    
+                    addSystemMessage(`成功连接到MQTT代理 (客户端ID: ${clientId})`);
+                });
+                
+                // 接收到消息
+                mqttClient.on('message', function(topic, message) {
+                    // 更新订阅主题的消息统计
+                    if (subscriptions.has(topic)) {
+                        const stats = subscriptions.get(topic);
+                        stats.receivedCount++;
+                        updateSubscriptionStats(topic, stats);
+                    }
+                    
+                    // 添加接收到的消息
+                    addMessage(topic, message.toString(), 'received', 'in');
+                });
+                
+                // 连接错误
+                mqttClient.on('error', function(error) {
+                    isConnected = false;
+                    updateConnectionStatus('连接错误', 'disconnected');
+                    connectDisconnectBtn.disabled = false;
+                    connectDisconnectBtn.innerHTML = '<i class="fas fa-link"></i> 连接';
+                    connectDisconnectBtn.className = 'btn-connect';
+                    
+                    addSystemMessage(`连接错误: ${error.message}`);
+                });
+                
+                // 连接关闭
+                mqttClient.on('close', function() {
+                    isConnected = false;
+                    updateConnectionStatus('已断开', 'disconnected');
+                    connectDisconnectBtn.disabled = false;
+                    connectDisconnectBtn.innerHTML = '<i class="fas fa-link"></i> 连接';
+                    connectDisconnectBtn.className = 'btn-connect';
+                    
+                    addSystemMessage('已与MQTT代理断开连接');
+                });
+                
+                // 重连
+                mqttClient.on('reconnect', function() {
+                    updateConnectionStatus('重新连接中...', 'disconnected');
+                    addSystemMessage('正在尝试重新连接...');
+                });
+                
+            } catch (error) {
+                isConnected = false;
+                updateConnectionStatus('连接失败', 'disconnected');
+                connectDisconnectBtn.disabled = false;
+                connectDisconnectBtn.innerHTML = '<i class="fas fa-link"></i> 连接';
+                connectDisconnectBtn.className = 'btn-connect';
+                
+                addSystemMessage(`连接异常: ${error.message}`);
+            }
+        }
+        
+        // 断开连接函数
+        function disconnectFromBroker() {
+            if (mqttClient && mqttClient.connected) {
+                addSystemMessage('正在断开连接...');
+                mqttClient.end();
+                
+                // 清空订阅列表
+                subscriptions.clear();
+                updateSubscriptionList();
+            }
+        }
+        
+        // 发布消息函数
+        function publishMessage() {
+            if (!mqttClient || !mqttClient.connected) {
+                addSystemMessage('请先连接到MQTT代理');
+                return;
+            }
+            
+            const topic = publishTopicInput.value.trim();
+            const message = publishMessageInput.value.trim();
+            const qos = parseInt(qosSelect.value);
+            
+            if (!topic) {
+                addSystemMessage('请输入要发布的主题');
+                return;
+            }
+            
+            if (!message) {
+                addSystemMessage('请输入要发布的消息内容');
+                return;
+            }
+            
+            try {
+                mqttClient.publish(topic, message, { qos: qos }, function(error) {
+                    if (error) {
+                        addSystemMessage(`发布失败: ${error.message}`);
+                    } else {
+                        // 更新订阅主题的消息统计
+                        if (subscriptions.has(topic)) {
+                            const stats = subscriptions.get(topic);
+                            stats.sentCount++;
+                            updateSubscriptionStats(topic, stats);
+                        }
+                        
+                        // 添加发送的消息
+                        addMessage(topic, message, 'sent', 'out');
+                        
+                        // 清空消息输入框（可选）
+                        // publishMessageInput.value = '';
+                    }
+                });
+            } catch (error) {
+                addSystemMessage(`发布异常: ${error.message}`);
+            }
+        }
+        
+        // 订阅主题函数
+        function subscribeToTopic() {
+            if (!mqttClient || !mqttClient.connected) {
+                addSystemMessage('请先连接到MQTT代理');
+                return;
+            }
+            
+            const topic = subscribeTopicInput.value.trim();
+            const qos = parseInt(qosSelect.value);
+            
+            if (!topic) {
+                addSystemMessage('请输入要订阅的主题');
+                return;
+            }
+            
+            // 检查是否已经订阅
+            if (subscriptions.has(topic)) {
+                addSystemMessage(`已经订阅了主题: ${topic}`);
+                return;
+            }
+            
+            try {
+                mqttClient.subscribe(topic, { qos: qos }, function(error) {
+                    if (error) {
+                        addSystemMessage(`订阅失败: ${error.message}`);
+                    } else {
+                        // 添加到订阅列表
+                        subscriptions.set(topic, {
+                            sentCount: 0,
+                            receivedCount: 0
+                        });
+                        updateSubscriptionList();
+                        
+                        addSystemMessage(`成功订阅主题: ${topic}`);
+                        
+                        // 清空订阅输入框（可选）
+                        // subscribeTopicInput.value = '';
+                    }
+                });
+            } catch (error) {
+                addSystemMessage(`订阅异常: ${error.message}`);
+            }
+        }
+        
+        // 取消订阅
+        function unsubscribeFromTopic(topic) {
+            if (!mqttClient || !mqttClient.connected) {
+                addSystemMessage('请先连接到MQTT代理');
+                return;
+            }
+            
+            try {
+                mqttClient.unsubscribe(topic, function(error) {
+                    if (error) {
+                        addSystemMessage(`取消订阅失败: ${error.message}`);
+                    } else {
+                        // 从订阅列表中移除
+                        subscriptions.delete(topic);
+                        updateSubscriptionList();
+                        
+                        addSystemMessage(`已取消订阅主题: ${topic}`);
+                    }
+                });
+            } catch (error) {
+                addSystemMessage(`取消订阅异常: ${error.message}`);
+            }
+        }
+        
+        // 更新订阅列表显示
+        function updateSubscriptionList() {
+            subscriptionsContainer.innerHTML = '';
+            
+            if (subscriptions.size === 0) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.className = 'empty-message';
+                emptyMsg.textContent = '暂无订阅主题';
+                subscriptionsContainer.appendChild(emptyMsg);
+                return;
+            }
+            
+            subscriptions.forEach((stats, topic) => {
+                const subscriptionItem = document.createElement('div');
+                subscriptionItem.className = 'subscription-item';
+                subscriptionItem.dataset.topic = topic;
+                
+                // 如果当前正在筛选此主题，添加active类
+                if (currentFilter.topic === topic) {
+                    subscriptionItem.classList.add('active');
+                }
+                
+                // 点击订阅项进行筛选
+                subscriptionItem.addEventListener('click', function(e) {
+                    // 如果点击的是取消订阅按钮，不触发筛选
+                    if (e.target.closest('.btn-unsubscribe')) {
+                        return;
+                    }
+                    filterByTopic(topic);
+                });
+				
+				// 创建HTML结构 - 使用正确的结构
+				subscriptionItem.innerHTML = `
+					<div class="subscription-info">
+						<div class="subscription-topic">
+							<div class="subscription-topic-x" title="${topic}">${topic}</div>
+							<div class="subscription-topic-x">
+								<button class="btn-unsubscribe" title="取消订阅">
+									<i class="fas fa-times"></i>
+								</button>
+							</div>
+						</div>
+						<div class="subscription-stats">
+							<div class="subscription-stat">
+								<i class="fas fa-paper-plane" style="color: #f59e0b;"></i> 
+								<span>${stats.sentCount}</span>
+							</div>
+							<div class="subscription-stat">
+								<i class="fas fa-inbox" style="color: #4ade80;"></i> 
+								<span>${stats.receivedCount}</span>
+							</div>
+						</div>
+					</div>
+					
+				`;
+				// 为取消订阅按钮添加事件监听器
+				const unsubscribeBtn = subscriptionItem.querySelector('.btn-unsubscribe');
+				unsubscribeBtn.addEventListener('click', function(e) {
+					e.stopPropagation(); // 阻止事件冒泡，避免触发筛选
+					unsubscribeFromTopic(topic);
+				});
+                subscriptionsContainer.appendChild(subscriptionItem);
+            });
+        }
+        
+        // 更新单个订阅主题的统计信息
+        function updateSubscriptionStats(topic, stats) {
+            const subscriptionItem = subscriptionsContainer.querySelector(`[data-topic="${topic}"]`);
+            if (subscriptionItem) {
+                const sentStat = subscriptionItem.querySelector('.subscription-stat:nth-child(1)');
+                const receivedStat = subscriptionItem.querySelector('.subscription-stat:nth-child(2)');
+                
+                if (sentStat) sentStat.innerHTML = `<i class="fas fa-paper-plane" style="color: #f59e0b;"></i> 发送: ${stats.sentCount}`;
+                if (receivedStat) receivedStat.innerHTML = `<i class="fas fa-inbox" style="color: #4ade80;"></i> 接收: ${stats.receivedCount}`;
+            }
+        }
+        
+        // 更新连接状态显示
+        function updateConnectionStatus(text, status) {
+            statusText.textContent = text;
+            
+            // 移除现有状态类
+            statusIndicator.classList.remove('connected', 'disconnected');
+            
+            // 添加新状态类
+            if (status === 'connected') {
+                statusIndicator.classList.add('connected');
+            } else {
+                statusIndicator.classList.add('disconnected');
+            }
+        }
+        
+        // 添加消息到日志
+        function addMessage(topic, message, source, type) {
+            // 创建消息对象
+            const messageObj = {
+                id: Date.now() + Math.random(),
+                topic: topic,
+                message: message,
+                source: source,
+                type: type,
+                timestamp: new Date()
+            };
+            
+            // 添加到消息数组
+            allMessages.unshift(messageObj);
+            
+            // 更新消息总数
+            totalMessagesCountElement.textContent = allMessages.length;
+            
+            // 应用当前筛选条件
+            filterMessages();
+        }
+        
+        // 添加系统消息
+        function addSystemMessage(message) {
+            addMessage('系统信息', message, 'system', 'system');
+        }
+        
+        // 筛选消息
+        function filterMessages() {
+            // 更新筛选条件
+            currentFilter.showSent = showSentMessagesCheckbox.checked;
+            currentFilter.showReceived = showReceivedMessagesCheckbox.checked;
+            
+            // 清空消息容器
+            messagesContainer.innerHTML = '';
+            
+            // 筛选消息
+            const filteredMessages = allMessages.filter(msg => {
+                // 按消息来源筛选
+                if (msg.source === 'sent' && !currentFilter.showSent) return false;
+                if (msg.source === 'received' && !currentFilter.showReceived) return false;
+                if (msg.source === 'system') return true; // 系统消息始终显示
+                
+                // 按主题筛选
+                if (currentFilter.topic) {
+                    return msg.topic === currentFilter.topic;
+                }
+                
+                return true;
+            });
+            
+            // 显示筛选后的消息
+            if (filteredMessages.length === 0) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.className = 'empty-message';
+                emptyMsg.textContent = currentFilter.topic 
+                    ? `没有找到主题 "${currentFilter.topic}" 的消息` 
+                    : '暂无消息';
+                messagesContainer.appendChild(emptyMsg);
+                return;
+            }
+            
+            filteredMessages.forEach(msg => {
+                const messageItem = document.createElement('div');
+                
+                // 根据类型设置CSS类和边框颜色
+                let typeClass = '';
+                let typeIndicatorClass = '';
+                
+                if (msg.type === 'in') {
+                    typeClass = 'log-type-in';
+                    typeIndicatorClass = 'message-type-in';
+                } else if (msg.type === 'out') {
+                    typeClass = 'log-type-out';
+                    typeIndicatorClass = 'message-type-out';
+                } else {
+                    typeClass = 'log-type-system';
+                    typeIndicatorClass = 'message-type-system';
+                }
+                
+                messageItem.className = `message-item ${typeClass}`;
+                
+                // 格式化当前时间
+                const timeString = msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                
+                // 处理消息内容，如果是JSON则格式化显示
+                let displayMessage = msg.message;
+                try {
+                    const parsed = JSON.parse(msg.message);
+                    displayMessage = JSON.stringify(parsed, null, 2);
+                } catch (e) {
+                    // 不是JSON，保持原样
+                }
+                
+                // 确定消息对齐方式
+                let alignmentClass = msg.source;
+                let messageTypeLabel = '';
+                
+                if (msg.source === 'sent') {
+                    messageTypeLabel = '发送';
+                } else if (msg.source === 'received') {
+                    messageTypeLabel = '接收';
+                } else {
+                    messageTypeLabel = '系统';
+                }
+                
+                messageItem.innerHTML = `
+                    <div class="message-time-col">
+                        <div class="message-time">${timeString}</div>
+                    </div>
+                    <div class="message-content-col">
+                        <div class="message-topic ${alignmentClass}">
+                            <span>${messageTypeLabel}: ${msg.topic}</span>
+                        </div>
+                        <div class="message-content-container">
+                            <div class="message-content ${alignmentClass}">
+								${escapeHtml(displayMessage)}
+							</div>
+                        </div>
+                    </div>
+                `;
+                
+                messagesContainer.appendChild(messageItem);
+            });
+        }
+        
+        // 按主题筛选消息
+        function filterByTopic(topic) {
+            currentFilter.topic = topic;
+            currentFilterTopicElement.textContent = topic;
+            activeFilterContainer.style.display = 'block';
+            
+            // 更新订阅项的高亮状态
+            updateSubscriptionHighlights();
+            
+            // 应用筛选
+            filterMessages();
+        }
+        
+        // 清除主题筛选
+        function clearTopicFilter() {
+            currentFilter.topic = null;
+            activeFilterContainer.style.display = 'none';
+            
+            // 更新订阅项的高亮状态
+            updateSubscriptionHighlights();
+            
+            // 应用筛选
+            filterMessages();
+        }
+        
+        // 更新订阅项的高亮状态
+        function updateSubscriptionHighlights() {
+            const subscriptionItems = subscriptionsContainer.querySelectorAll('.subscription-item');
+            subscriptionItems.forEach(item => {
+                const topic = item.dataset.topic;
+                if (currentFilter.topic === topic) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+        
+        // 清空消息
+        function clearMessages() {
+            allMessages = [];
+            totalMessagesCountElement.textContent = '0';
+            
+            // 重置所有订阅的统计
+            subscriptions.forEach((stats, topic) => {
+                stats.sentCount = 0;
+                stats.receivedCount = 0;
+            });
+            
+            updateSubscriptionList();
+            filterMessages();
+            
+            addSystemMessage('所有消息已清空');
+        }
+        
+        // HTML转义函数，防止XSS攻击
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // 初始化示例订阅
+        function initExampleSubscriptions() {
+            // 如果连接到公共服务器，自动订阅示例主题
+            if (brokerUrlSelect.value.includes('broker.emqx.io')) {
+                subscribeTopicInput.value = 'test/#';
+            }
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initExampleSubscriptions();
+            
+            // 添加键盘快捷键
+            document.addEventListener('keydown', function(event) {
+                // Ctrl+Enter 发布消息
+                if (event.ctrlKey && event.key === 'Enter' && document.activeElement.id !== 'publishMessage') {
+                    publishMessage();
+                }
+                
+                // Ctrl+Shift+Enter 订阅主题
+                if (event.ctrlKey && event.shiftKey && event.key === 'Enter') {
+                    subscribeToTopic();
+                }
+            });
+            
+            // 自动调整文本框高度
+            publishMessageInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+        });
+    </script>
+</body>
+</html>

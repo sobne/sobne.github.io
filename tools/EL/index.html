@@ -1,0 +1,3069 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EL规则可视化设计器</title>
+<style>
+/* ========== CSS Variables & Reset ========== */
+:root {
+  --primary: #2563EB;
+  --primary-light: #3B82F6;
+  --primary-bg: #EFF6FF;
+  --cta: #F97316;
+  --bg: #F8FAFC;
+  --surface: #FFFFFF;
+  --text: #1E293B;
+  --text-secondary: #64748B;
+  --border: #E2E8F0;
+  --border-light: #F1F5F9;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+  --radius: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --transition: 200ms ease;
+  --node-start: #10B981;
+  --node-end: #EF4444;
+  --node-normal: #3B82F6;
+  --node-switch: #EC4899;
+  --node-if: #06B6D4;
+  --node-for: #84CC16;
+  --node-while: #F97316;
+  --panel-width: 240px;
+  --toolbar-height: 52px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ========== Toolbar ========== */
+.toolbar {
+  height: var(--toolbar-height);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 8px;
+  box-shadow: var(--shadow-sm);
+  z-index: 100;
+  position: relative;
+}
+
+.toolbar .logo {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-right: 16px;
+  white-space: nowrap;
+  letter-spacing: -0.3px;
+}
+
+.toolbar .logo span { color: var(--cta); }
+
+.toolbar .divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+  margin: 0 4px;
+}
+
+.toolbar button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.toolbar button:hover {
+  background: var(--primary-bg);
+  border-color: var(--primary-light);
+  color: var(--primary);
+}
+
+.toolbar button:active { transform: scale(0.97); }
+
+.toolbar button.primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.toolbar button.primary:hover {
+  background: #1D4ED8;
+  border-color: #1D4ED8;
+}
+
+.toolbar button svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+/* ========== Main Layout ========== */
+.main-container {
+  display: flex;
+  height: calc(100vh - var(--toolbar-height));
+}
+
+/* ========== Left Panel ========== */
+.left-panel {
+  width: var(--panel-width);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.panel-header {
+  padding: 14px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.component-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.component-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  cursor: grab;
+  transition: all var(--transition);
+  border: 1px solid transparent;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.component-item:hover {
+  background: var(--primary-bg);
+  border-color: var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.component-item:active { cursor: grabbing; opacity: 0.8; }
+
+.comp-group {
+  margin-bottom: 4px;
+}
+
+.comp-group-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 8px 12px 4px;
+  border-top: 1px solid var(--border-light);
+}
+
+.comp-group:first-child .comp-group-title {
+  border-top: none;
+  padding-top: 0;
+}
+
+.component-item .comp-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+}
+
+.comp-icon.start { background: var(--node-start); border-radius: 16px; }
+.comp-icon.end { background: var(--node-end); border-radius: 16px; }
+.comp-icon.normal { background: var(--node-normal); }
+.comp-icon.switch { background: var(--node-switch); }
+.comp-icon.if { background: var(--node-if); }
+.comp-icon.for { background: var(--node-for); }
+.comp-icon.while { background: var(--node-while); }
+
+/* ========== Canvas Area ========== */
+.canvas-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle, #E2E8F0 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-color: #F8FAFC;
+}
+
+#canvas {
+  position: relative;
+  cursor: default;
+  transform-origin: 0 0;
+}
+
+#canvas.panning { cursor: grabbing; }
+
+#canvas svg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+#canvas svg line,
+#canvas svg path {
+  pointer-events: stroke;
+}
+
+.canvas-node {
+  position: absolute;
+  min-width: 40px;
+  border-radius: var(--radius-lg);
+  border: 2px solid transparent;
+  cursor: move;
+  transition: box-shadow var(--transition);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 14px;
+  z-index: 10;
+}
+
+.canvas-node:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.canvas-node.selected {
+  box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.25);
+}
+
+.canvas-node .node-icon {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 8px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* 普通节点图标：正方形 */
+.canvas-node .node-icon.shape-normal,
+.canvas-node .node-icon.shape-start,
+.canvas-node .node-icon.shape-end {
+  border-radius: 3px;
+}
+.canvas-node .node-icon.shape-normal span{
+  display: none;
+}
+
+/* 分支节点图标：菱形 */
+.canvas-node .node-icon.shape-switch,
+.canvas-node .node-icon.shape-if {
+  transform: rotate(45deg);
+  border-radius: 2px;
+}
+.canvas-node .node-icon.shape-switch span,
+.canvas-node .node-icon.shape-if span {
+  transform: rotate(-45deg);
+  display: inline-block;
+}
+
+/* 循环节点图标：圆形 */
+.canvas-node .node-icon.shape-for,
+.canvas-node .node-icon.shape-while {
+  border-radius: 50%;
+}
+
+/* Icon background colors */
+.node-start .node-icon { background: var(--node-start); display:none;}
+.node-end .node-icon { background: var(--node-end); display:none;}
+.node-normal .node-icon { background: var(--node-normal); display:none;}
+.node-switch .node-icon { background: var(--node-switch); }
+.node-if .node-icon { background: var(--node-if); }
+.node-for .node-icon { background: var(--node-for); }
+.node-while .node-icon { background: var(--node-while); }
+
+.canvas-node .node-label {
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  word-break: break-all;
+  max-width: 120px;
+}
+
+.canvas-node .node-type-tag {
+  font-size: 10px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  display: none;
+}
+
+/* Node type styles */
+.node-start { background: #D1FAE5; border-color: var(--node-start); border-radius: 30px; }
+.node-end { background: #FEE2E2; border-color: var(--node-end); border-radius: 30px; }
+.node-normal { background: #DBEAFE; border-color: var(--node-normal); border-radius: 8px; }
+.node-switch { background: #FCE7F3; border-color: var(--node-switch); }
+.node-if { background: #CFFAFE; border-color: var(--node-if); }
+.node-for { background: #ECFCCB; border-color: var(--node-for); }
+.node-while { background: #FFEDD5; border-color: var(--node-while); }
+
+/* Connection ports */
+.port {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 2px solid #fff;
+  box-shadow: var(--shadow-sm);
+  cursor: crosshair;
+  z-index: 20;
+  transition: transform var(--transition), background var(--transition);
+}
+
+.port:hover {
+  transform: scale(1.3);
+  background: var(--cta);
+}
+
+.port.input { top: 50%; left: -6px; transform: translateY(-50%); }
+.port.output { top: 50%; right: -6px; transform: translateY(-50%); }
+.port.input:hover { transform: translateY(-50%) scale(1.3); }
+.port.output:hover { transform: translateY(-50%) scale(1.3); }
+
+/* ========== Right Panel ========== */
+.right-panel {
+  width: 300px;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* Tab Bar */
+.tab-bar {
+  display: flex;
+  border-bottom: 2px solid var(--border-light);
+  flex-shrink: 0;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px 8px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  position: relative;
+}
+
+.tab-btn:hover {
+  color: var(--primary);
+  background: var(--primary-bg);
+}
+
+.tab-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 600;
+}
+
+/* Tab Content */
+.tab-content {
+  flex: 1;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tab-content.active {
+  display: flex;
+}
+
+.prop-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.prop-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-align: center;
+  padding: 20px;
+}
+
+.prop-group {
+  margin-bottom: 16px;
+}
+
+.prop-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  //text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.prop-group input,
+.prop-group select,
+.prop-group textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  background: var(--bg);
+  color: var(--text);
+  transition: border-color var(--transition);
+}
+
+.prop-group input:focus,
+.prop-group select:focus,
+.prop-group textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.prop-group textarea {
+  resize: vertical;
+  min-height: 50px;
+}
+
+/* XML Preview (inside tab) */
+.xml-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-light);
+  flex-shrink: 0;
+}
+
+.copy-btn {
+  font-size: 11px;
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all var(--transition);
+}
+
+.copy-btn:hover {
+  background: var(--primary-bg);
+  color: var(--primary);
+  border-color: var(--primary-light);
+}
+
+.copy-btn.copied {
+  background: #D1FAE5;
+  color: #059669;
+  border-color: #059669;
+}
+
+.xml-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  color: var(--text);
+  background: #F8FAFC;
+}
+
+/* Custom scrollbar for XML content */
+.xml-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.xml-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.xml-content::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 3px;
+}
+
+.xml-content::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* ========== Context Menu ========== */
+.context-menu {
+  position: fixed;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  min-width: 160px;
+  padding: 4px;
+  display: none;
+}
+
+.context-menu .menu-item {
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.context-menu .menu-item:hover {
+  background: var(--primary-bg);
+  color: var(--primary);
+}
+
+.context-menu .menu-item.danger { color: var(--node-end); }
+.context-menu .menu-item.danger:hover { background: #FEE2E2; }
+
+/* ========== Toast ========== */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  z-index: 2000;
+  opacity: 0;
+  transition: opacity var(--transition);
+  pointer-events: none;
+}
+
+.toast.show { opacity: 1; }
+
+/* ========== Dragging Ghost ========== */
+.drag-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0.9;
+  transform: translate(-50%, -50%);
+}
+
+/* ========== Resize Handle ========== */
+.resize-handle {
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 4px;
+  cursor: col-resize;
+  background: transparent;
+  z-index: 30;
+}
+
+.resize-handle:hover { background: var(--primary-light); }
+
+/* ========== Connection temp line ========== */
+.temp-line {
+  stroke: var(--primary);
+  stroke-width: 2;
+  stroke-dasharray: 5,5;
+  pointer-events: none;
+}
+
+/* ========== Arrow marker ========== */
+.arrow-marker {
+  fill: var(--primary);
+}
+
+/* ========== Mini map ========== */
+.minimap {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 160px;
+  height: 110px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  z-index: 50;
+  overflow: hidden;
+}
+
+.minimap canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* ========== Scrollbar ========== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: #CBD5E1; }
+
+/* ========== Connection highlight ========== */
+.connection-line {
+  stroke: var(--primary);
+  cursor: pointer;
+  transition: stroke var(--transition), stroke-width var(--transition);
+}
+
+.connection-line:hover {
+  stroke: var(--cta);
+  stroke-width: 1.5;
+}
+
+.connection-line.selected {
+  stroke: var(--cta);
+  stroke-width: 1.5;
+  stroke-dasharray: none;
+}
+</style>
+</head>
+<body>
+
+<!-- ========== Toolbar ========== -->
+<div class="toolbar">
+  <div class="logo">EL<span>规则设计器</span></div>
+  <div class="divider"></div>
+  <button onclick="clearCanvas()" title="清空画布">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14"/></svg>
+    清空
+  </button>
+  <button onclick="autoLayout()" title="自动布局">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    自动布局
+  </button>
+  <button onclick="exportXML()" title="导出XML">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+    导出XML
+  </button>
+  <button onclick="importExample()" title="导入示例">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+    导入示例
+  </button>
+</div>
+
+<!-- ========== Main Container ========== -->
+<div class="main-container">
+  <!-- Left Panel: Components -->
+  <div class="left-panel">
+    <div class="panel-header">节点组件</div>
+    <div class="component-list" id="componentList">
+      <div class="comp-group">
+        <div class="comp-group-title">起止节点</div>
+        <div class="component-item" draggable="true" data-type="start" data-icon="&#9654;">
+          <div class="comp-icon start">&#9654;</div>
+          <span>开始节点</span>
+        </div>
+        <div class="component-item" draggable="true" data-type="end" data-icon="&#9632;">
+          <div class="comp-icon end">&#9632;</div>
+          <span>结束节点</span>
+        </div>
+      </div>
+      <div class="comp-group">
+        <div class="comp-group-title">通用节点</div>
+        <div class="component-item" draggable="true" data-type="normal" data-icon="A">
+          <div class="comp-icon normal">A</div>
+          <span>普通节点</span>
+        </div>
+      </div>
+      <div class="comp-group">
+        <div class="comp-group-title">分支控制</div>
+        <div class="component-item" draggable="true" data-type="switch" data-icon="S">
+          <div class="comp-icon switch">S</div>
+          <span>选择 SWITCH</span>
+        </div>
+        <div class="component-item" draggable="true" data-type="if" data-icon="?">
+          <div class="comp-icon if">?</div>
+          <span>条件 IF/ELSE</span>
+        </div>
+      </div>
+      <div class="comp-group">
+        <div class="comp-group-title">循环控制</div>
+        <div class="component-item" draggable="true" data-type="for" data-icon="F">
+          <div class="comp-icon for">F</div>
+          <span>循环 FOR</span>
+        </div>
+        <div class="component-item" draggable="true" data-type="while" data-icon="L">
+          <div class="comp-icon while">L</div>
+          <span>循环 WHILE</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Center: Canvas -->
+  <div class="canvas-wrapper" id="canvasWrapper">
+    <div id="canvas">
+      <svg id="svgLayer"></svg>
+    </div>
+    <div class="minimap" id="minimap">
+      <canvas id="minimapCanvas"></canvas>
+    </div>
+  </div>
+
+  <!-- Right Panel: Properties + XML -->
+  <div class="right-panel">
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="properties">属性</button>
+      <button class="tab-btn" data-tab="xml">XML预览</button>
+    </div>
+    <div class="tab-content active" id="tabProperties">
+      <div class="prop-content" id="propContent">
+        <div class="prop-empty">选择节点以编辑属性</div>
+      </div>
+    </div>
+    <div class="tab-content" id="tabXml">
+      <div class="xml-panel-header">
+        XML预览
+        <button class="copy-btn" id="copyBtn" onclick="copyXML()">复制</button>
+      </div>
+      <div class="xml-content" id="xmlContent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Context Menu -->
+<div class="context-menu" id="contextMenu">
+  <div class="menu-item" onclick="contextDeleteNode()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+    删除节点
+  </div>
+  <div class="menu-item" onclick="contextDeleteConnection()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="20" x2="20" y2="4"/></svg>
+    删除连线
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== EL Rule Designer - Core Logic ====================
+
+// ----- State -----
+const state = {
+  nodes: [],
+  connections: [],
+  nextId: 1,
+  selectedNodeId: null,
+  selectedConnectionId: null,
+  dragMode: null, // 'node' | 'connection' | 'canvas' | null
+  dragData: null,
+  connectingFrom: null, // { nodeId, portType }
+  canvasOffset: { x: 0, y: 0 },
+  canvasScale: 1,
+  canvasWidth: 4000,
+  canvasHeight: 3000,
+  panStart: null,
+  contextTarget: null,
+  contextConnectionId: null,
+};
+
+// ----- DOM Refs -----
+const canvas = document.getElementById('canvas');
+const svgLayer = document.getElementById('svgLayer');
+const canvasWrapper = document.getElementById('canvasWrapper');
+const propContent = document.getElementById('propContent');
+const xmlContent = document.getElementById('xmlContent');
+const contextMenu = document.getElementById('contextMenu');
+const toast = document.getElementById('toast');
+const copyBtn = document.getElementById('copyBtn');
+const minimapCanvas = document.getElementById('minimapCanvas');
+const minimap = document.getElementById('minimap');
+
+// ----- SVG Namespace -----
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+// ----- Helper Functions -----
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toast._timeout);
+  toast._timeout = setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+function getNodeById(id) {
+  return state.nodes.find(n => n.id === id);
+}
+
+function getConnectionById(id) {
+  return state.connections.find(c => c.id === id);
+}
+
+function getConnectionsForNode(nodeId) {
+  return state.connections.filter(c => c.from === nodeId || c.to === nodeId);
+}
+
+function generateId() {
+  return state.nextId++;
+}
+
+// ----- SVG Drawing -----
+function createSVGElement(tag, attrs = {}) {
+  const el = document.createElementNS(SVG_NS, tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    el.setAttribute(k, v);
+  }
+  return el;
+}
+
+function getPortPosition(nodeId, portType) {
+  const nodeEl = document.querySelector(`.canvas-node[data-id="${nodeId}"]`);
+  if (!nodeEl) return null;
+  const node = getNodeById(nodeId);
+  if (!node) return null;
+  const rect = nodeEl.getBoundingClientRect();
+  const scale = state.canvasScale;
+  // In world coordinates: node's position in canvas space before transform
+  const x = portType === 'input' ? node.x : node.x + rect.width / scale;
+  const y = node.y + (rect.height / scale) / 2;
+  return { x, y };
+}
+
+function drawAllConnections() {
+  svgLayer.innerHTML = '';
+
+  // Arrow marker definition
+  const defs = createSVGElement('defs');
+  const marker = createSVGElement('marker', {
+    id: 'arrowhead',
+    markerWidth: '10',
+    markerHeight: '7',
+    refX: '10',
+    refY: '3.5',
+    orient: 'auto',
+  });
+  marker.classList.add('arrow-marker');
+  const polygon = createSVGElement('polygon', {
+    points: '0 0, 10 3.5, 0 7',
+    fill: '#2563EB',
+  });
+  marker.appendChild(polygon);
+  defs.appendChild(marker);
+  svgLayer.appendChild(defs);
+
+  state.connections.forEach(conn => {
+    const fromPos = getPortPosition(conn.from, 'output');
+    const toPos = getPortPosition(conn.to, 'input');
+    if (!fromPos || !toPos) return;
+
+    const group = createSVGElement('g');
+
+    // Draw path with slight curve
+    const dx = toPos.x - fromPos.x;
+    const cpOffset = Math.max(Math.abs(dx) * 0.5, 30);
+    const path = createSVGElement('path', {
+      d: `M ${fromPos.x} ${fromPos.y} C ${fromPos.x + cpOffset} ${fromPos.y}, ${toPos.x - cpOffset} ${toPos.y}, ${toPos.x} ${toPos.y}`,
+      fill: 'none',
+      class: 'connection-line',
+      'data-connection-id': conn.id,
+      // 'marker-end': 'url(#arrowhead)',
+      'stroke-linecap': 'round',
+    });
+
+    if (conn.id === state.selectedConnectionId) {
+      path.classList.add('selected');
+    }
+
+    // Hit area (wider for easier clicking)
+    const hitPath = createSVGElement('path', {
+      d: `M ${fromPos.x} ${fromPos.y} C ${fromPos.x + cpOffset} ${fromPos.y}, ${toPos.x - cpOffset} ${toPos.y}, ${toPos.x} ${toPos.y}`,
+      fill: 'none',
+      stroke: 'transparent',
+      'stroke-width': '12',
+      'data-connection-id': conn.id,
+      style: 'cursor: pointer; pointer-events: stroke;',
+    });
+
+    hitPath.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectConnection(conn.id);
+    });
+
+    hitPath.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      state.contextConnectionId = conn.id;
+      state.contextTarget = 'connection';
+      showContextMenu(e.clientX, e.clientY, true);
+    });
+
+    group.appendChild(path);
+    group.appendChild(hitPath);
+    svgLayer.appendChild(group);
+  });
+}
+
+// ----- Node Rendering -----
+function getNodeTypeClass(type) {
+  const map = {
+    start: 'node-start',
+    end: 'node-end',
+    normal: 'node-normal',
+    switch: 'node-switch',
+    if: 'node-if',
+    for: 'node-for',
+    while: 'node-while',
+  };
+  return map[type] || 'node-normal';
+}
+
+function getNodeIcon(type) {
+  const map = {
+    start: '▶', end: '■', normal: 'A',
+    switch: 'S', if: '?', for: 'F', while: 'L',
+  };
+  return map[type] || '?';
+}
+
+function getNodeIconShape(type) {
+  // Map node type to icon shape class
+  if (type === 'switch' || type === 'if') return 'shape-switch'; // diamond
+  if (type === 'for' || type === 'while') return 'shape-for'; // circle
+  return 'shape-normal'; // square (normal, start, end)
+}
+
+function getNodeTypeName(type) {
+  const map = {
+    start: '开始', end: '结束', normal: '普通',
+    switch: 'SWITCH', if: 'IF', for: 'FOR', while: 'WHILE',
+  };
+  return map[type] || type;
+}
+
+function renderNode(node) {
+  let existing = document.querySelector(`.canvas-node[data-id="${node.id}"]`);
+  if (!existing) {
+    existing = document.createElement('div');
+    existing.className = 'canvas-node';
+    existing.setAttribute('data-id', node.id);
+    canvas.appendChild(existing);
+  }
+
+  existing.className = `canvas-node ${getNodeTypeClass(node.type)}`;
+  if (node.id === state.selectedNodeId) {
+    existing.classList.add('selected');
+  }
+  existing.style.left = node.x + 'px';
+  existing.style.top = node.y + 'px';
+
+  const label = node.label || node.id;
+  const iconText = getNodeIcon(node.type);
+  const shapeClass = getNodeIconShape(node.type);
+  const isDiamond = (node.type === 'switch' || node.type === 'if');
+  existing.innerHTML = `
+    <div class="node-icon ${getNodeTypeClass(node.type)} ${shapeClass}"><span>${iconText}</span></div>
+    <div class="node-label">${label}</div>
+    <div class="node-type-tag">${getNodeTypeName(node.type)}</div>
+  `;
+
+  // Input port (except start nodes)
+  if (node.type !== 'start') {
+    const inPort = document.createElement('div');
+    inPort.className = 'port input';
+    inPort.setAttribute('data-port', 'input');
+    inPort.setAttribute('data-node-id', node.id);
+    inPort.addEventListener('mousedown', (e) => startConnection(e, node.id, 'input'));
+    existing.appendChild(inPort);
+  }
+
+  // Output port (except end nodes)
+  if (node.type !== 'end') {
+    const outPort = document.createElement('div');
+    outPort.className = 'port output';
+    outPort.setAttribute('data-port', 'output');
+    outPort.setAttribute('data-node-id', node.id);
+    outPort.addEventListener('mousedown', (e) => startConnection(e, node.id, 'output'));
+    existing.appendChild(outPort);
+  }
+
+  // Node events
+  existing.addEventListener('mousedown', (e) => startDragNode(e, node.id));
+  existing.addEventListener('click', (e) => {
+    e.stopPropagation();
+    selectNode(node.id);
+  });
+  existing.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    state.contextTarget = node.id;
+    state.contextConnectionId = null;
+    showContextMenu(e.clientX, e.clientY, false);
+  });
+
+  return existing;
+}
+
+function renderAllNodes() {
+  state.nodes.forEach(renderNode);
+  drawAllConnections();
+  updateXML();
+  updateMinimap();
+}
+
+// ----- Node Selection -----
+function selectNode(nodeId) {
+  state.selectedNodeId = nodeId;
+  state.selectedConnectionId = null;
+
+  document.querySelectorAll('.canvas-node').forEach(el => {
+    el.classList.toggle('selected', parseInt(el.dataset.id) === nodeId);
+  });
+
+  drawAllConnections();
+  updatePropertiesPanel(nodeId);
+}
+
+function selectConnection(connId) {
+  state.selectedConnectionId = connId;
+  state.selectedNodeId = null;
+
+  document.querySelectorAll('.canvas-node').forEach(el => el.classList.remove('selected'));
+  drawAllConnections();
+  updatePropertiesPanel(null);
+}
+
+// ----- Add Node -----
+function addNode(type, x, y) {
+  const id = generateId();
+  let label = '';
+
+  switch (type) {
+    case 'start':
+      // Auto-number start nodes: first is "开始", subsequent are "chain2", "chain3"...
+      const startCount = state.nodes.filter(n => n.type === 'start').length;
+      label = startCount === 0 ? '开始' : 'chain' + (startCount + 1);
+      break;
+    case 'end': label = '结束'; break;
+    case 'normal': label = String.fromCharCode(64 + id); break;
+    //case 'switch': label = 'SWITCH'; break;
+    //case 'if': label = 'IF'; break;
+    //case 'for': label = 'FOR'; break;
+    //case 'while': label = 'WHILE'; break;
+	// 以上还是显示组件
+	default: label = String.fromCharCode(64 + id); 
+  }
+
+  const node = {
+    id,
+    type,
+    label,
+    x: x - 80,
+    y: y - 30,
+    expression: type === 'switch' ? 'x' : type === 'if' ? 'x' : type === 'for' ? '3' : type === 'while' ? 'w' : '',
+    data: '',
+  };
+
+  state.nodes.push(node);
+  renderNode(node);
+  drawAllConnections();
+  updateXML();
+  updateMinimap();
+  selectNode(id);
+}
+
+// ----- Delete Node -----
+function deleteNode(nodeId) {
+  const node = getNodeById(nodeId);
+  if (!node) return;
+
+  // Remove connections
+  state.connections = state.connections.filter(c => c.from !== nodeId && c.to !== nodeId);
+
+  // Remove DOM element
+  const el = document.querySelector(`.canvas-node[data-id="${nodeId}"]`);
+  if (el) el.remove();
+
+  // Remove from state
+  state.nodes = state.nodes.filter(n => n.id !== nodeId);
+
+  if (state.selectedNodeId === nodeId) {
+    state.selectedNodeId = null;
+    updatePropertiesPanel(null);
+  }
+
+  drawAllConnections();
+  updateXML();
+  updateMinimap();
+}
+
+// ----- Drag Node -----
+function startDragNode(e, nodeId) {
+  if (e.button !== 0) return;
+  if (e.target.classList.contains('port')) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const node = getNodeById(nodeId);
+  if (!node) return;
+
+  const nodeEl = e.currentTarget;
+  const rect = nodeEl.getBoundingClientRect();
+  const offsetX = e.clientX - rect.left;
+  const offsetY = e.clientY - rect.top;
+
+  state.dragMode = 'node';
+  state.dragData = { nodeId, offsetX, offsetY, startX: node.x, startY: node.y };
+
+  const onMove = (ev) => {
+    const scale = state.canvasScale;
+    const pos = screenToCanvas(ev.clientX, ev.clientY);
+    const newX = pos.x - state.dragData.offsetX / scale;
+    const newY = pos.y - state.dragData.offsetY / scale;
+    node.x = Math.max(0, newX);
+    node.y = Math.max(0, newY);
+    nodeEl.style.left = node.x + 'px';
+    nodeEl.style.top = node.y + 'px';
+    drawAllConnections();
+    updateMinimap();
+  };
+
+  const onUp = () => {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    state.dragMode = null;
+    state.dragData = null;
+    drawAllConnections();
+    updateMinimap();
+  };
+
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+// ----- Connection Drawing -----
+function startConnection(e, nodeId, portType) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  state.connectingFrom = { nodeId, portType };
+  state.dragMode = 'connection';
+
+  const onMove = (ev) => {
+    // Draw temp line
+    const fromPos = getPortPosition(nodeId, portType);
+    if (!fromPos) return;
+    const pos = screenToCanvas(ev.clientX, ev.clientY);
+    const mx = pos.x;
+    const my = pos.y;
+
+    // Update temp line
+    let tempLine = svgLayer.querySelector('.temp-line');
+    if (!tempLine) {
+      tempLine = createSVGElement('line', { class: 'temp-line' });
+      svgLayer.appendChild(tempLine);
+    }
+    tempLine.setAttribute('x1', fromPos.x);
+    tempLine.setAttribute('y1', fromPos.y);
+    tempLine.setAttribute('x2', mx);
+    tempLine.setAttribute('y2', my);
+  };
+
+  const onUp = (ev) => {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+
+    // Remove temp line
+    const tempLine = svgLayer.querySelector('.temp-line');
+    if (tempLine) tempLine.remove();
+
+    // Find target port
+    const target = document.elementFromPoint(ev.clientX, ev.clientY);
+    const targetPort = target?.closest?.('.port');
+    if (targetPort) {
+      const targetNodeId = parseInt(targetPort.dataset.nodeId);
+      const targetPortType = targetPort.dataset.port;
+
+      if (targetNodeId && targetNodeId !== nodeId) {
+        // Validate: output -> input
+        if (portType === 'output' && targetPortType === 'input') {
+          // Check duplicate
+          const exists = state.connections.some(
+            c => c.from === nodeId && c.to === targetNodeId
+          );
+          if (!exists) {
+            state.connections.push({
+              id: generateId(),
+              from: nodeId,
+              to: targetNodeId,
+            });
+          }
+        }
+      }
+    }
+
+    state.connectingFrom = null;
+    state.dragMode = null;
+    drawAllConnections();
+    updateXML();
+    updateMinimap();
+  };
+
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+// ----- Delete Connection -----
+function deleteConnection(connId) {
+  state.connections = state.connections.filter(c => c.id !== connId);
+  if (state.selectedConnectionId === connId) {
+    state.selectedConnectionId = null;
+  }
+  drawAllConnections();
+  updateXML();
+  updateMinimap();
+}
+
+// ----- Canvas Panning -----
+canvas.addEventListener('mousedown', (e) => {
+  if (e.target !== canvas && e.target !== svgLayer) return;
+  if (e.button === 1 || (e.button === 0 && e.altKey)) {
+    e.preventDefault();
+    canvas.classList.add('panning');
+    const scale = state.canvasScale;
+    state.panStart = { x: e.clientX - state.canvasOffset.x * scale, y: e.clientY - state.canvasOffset.y * scale };
+
+    const onMove = (ev) => {
+      state.canvasOffset.x = (ev.clientX - state.panStart.x) / scale;
+      state.canvasOffset.y = (ev.clientY - state.panStart.y) / scale;
+      applyCanvasTransform();
+    };
+
+    const onUp = () => {
+      canvas.classList.remove('panning');
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      state.panStart = null;
+    };
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  }
+});
+
+canvas.addEventListener('click', (e) => {
+  if (e.target === canvas || e.target === svgLayer) {
+    state.selectedNodeId = null;
+    state.selectedConnectionId = null;
+    document.querySelectorAll('.canvas-node').forEach(el => el.classList.remove('selected'));
+    drawAllConnections();
+    updatePropertiesPanel(null);
+  }
+});
+
+// Prevent default canvas drag behavior
+canvas.addEventListener('dragstart', e => e.preventDefault());
+
+// ----- Context Menu -----
+function showContextMenu(x, y, isConnection) {
+  contextMenu.style.display = 'block';
+  contextMenu.style.left = x + 'px';
+  contextMenu.style.top = y + 'px';
+
+  const items = contextMenu.querySelectorAll('.menu-item');
+  items[0].style.display = isConnection ? 'none' : 'flex';
+  items[1].style.display = isConnection ? 'flex' : 'none';
+}
+
+function hideContextMenu() {
+  contextMenu.style.display = 'none';
+}
+
+function contextDeleteNode() {
+  if (state.contextTarget && typeof state.contextTarget === 'number') {
+    deleteNode(state.contextTarget);
+  }
+  hideContextMenu();
+}
+
+function contextDeleteConnection() {
+  if (state.contextConnectionId) {
+    deleteConnection(state.contextConnectionId);
+  }
+  hideContextMenu();
+}
+
+document.addEventListener('click', hideContextMenu);
+
+// ----- Drop from Left Panel -----
+const componentItems = document.querySelectorAll('.component-item');
+componentItems.forEach(item => {
+  item.addEventListener('dragstart', (e) => {
+    e.dataTransfer.setData('text/plain', item.dataset.type);
+    e.dataTransfer.effectAllowed = 'copy';
+  });
+});
+
+canvasWrapper.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+});
+
+canvasWrapper.addEventListener('drop', (e) => {
+  e.preventDefault();
+  const type = e.dataTransfer.getData('text/plain');
+  if (!type) return;
+  const pos = screenToCanvas(e.clientX, e.clientY);
+  addNode(type, pos.x, pos.y);
+});
+
+// ----- Properties Panel -----
+function updatePropertiesPanel(nodeId) {
+  if (!nodeId) {
+    propContent.innerHTML = '<div class="prop-empty">选择节点以编辑属性</div>';
+    return;
+  }
+
+  const node = getNodeById(nodeId);
+  if (!node) {
+    propContent.innerHTML = '<div class="prop-empty">选择节点以编辑属性</div>';
+    return;
+  }
+
+  let html = '';
+
+  // Basic info
+  html += `
+    <div class="prop-group">
+      <label>节点ID</label>
+      <input type="text" value="${node.id}" readonly style="background:#F1F5F9;">
+    </div>
+    <div class="prop-group">
+      <label>节点类型</label>
+      <input type="text" value="${getNodeTypeName(node.type)}" readonly style="background:#F1F5F9;">
+    </div>
+    <div class="prop-group">
+      <label>节点标签</label>
+      <input type="text" value="${node.label || ''}" onchange="updateNodeProperty(${node.id}, 'label', this.value)">
+    </div>
+  `;
+
+  // Expression for special nodes
+  if (['switch', 'if', 'for', 'while'].includes(node.type)) {
+    const exprLabel = node.type === 'switch' ? '选择表达式 (SWITCH)' :
+                      node.type === 'if' ? '条件表达式 (IF)' :
+                      node.type === 'for' ? '循环次数/变量 (FOR)' :
+                      '条件表达式 (WHILE)';
+    html += `
+      <div class="prop-group">
+        <label>${exprLabel}</label>
+        <input type="text" value="${node.expression || ''}"
+          onchange="updateNodeProperty(${node.id}, 'expression', this.value)"
+          placeholder="输入表达式">
+      </div>
+    `;
+  }
+
+  // Data property for all non-start/end nodes
+  if (node.type !== 'start' && node.type !== 'end') {
+    const safeData = (node.data || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    html += `
+      <div class="prop-group">
+        <label>参数 (JSON格式)</label>
+        <textarea class="prop-data" data-node-id="${node.id}"
+          placeholder='{"key":"value"}'>${safeData}</textarea>
+      </div>
+    `;
+  }
+
+  // Hint for normal nodes about serial/parallel behavior
+  const outConns = state.connections.filter(c => c.from === nodeId);
+  const inConns = state.connections.filter(c => c.to === nodeId);
+
+  if (node.type === 'normal') {
+    if (outConns.length === 1) {
+      html += `
+        <div class="prop-group">
+          <div style="font-size:12px;color:var(--text-secondary);padding:8px;background:var(--bg);border-radius:var(--radius);">
+            单输出 → 串行 THEN(当前节点, 下一节点)
+          </div>
+        </div>
+      `;
+    } else if (outConns.length > 1) {
+      html += `
+        <div class="prop-group">
+          <div style="font-size:12px;color:var(--text-secondary);padding:8px;background:var(--bg);border-radius:var(--radius);">
+            多输出 → 并行 WHEN(子节点...)
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  // Show connections info
+
+  if (inConns.length > 0) {
+    html += `<div class="prop-group"><label>输入连线 (${inConns.length})</label>`;
+    inConns.forEach(c => {
+      const fromNode = getNodeById(c.from);
+      html += `<div style="font-size:12px;padding:4px 0;color:var(--text-secondary);">← ${fromNode?.label || c.from} (连线ID: ${c.id})</div>`;
+    });
+    html += `</div>`;
+  }
+
+  if (outConns.length > 0) {
+    html += `<div class="prop-group"><label>输出连线 (${outConns.length})</label>`;
+    outConns.forEach(c => {
+      const toNode = getNodeById(c.to);
+      html += `<div style="font-size:12px;padding:4px 0;color:var(--text-secondary);">→ ${toNode?.label || c.to} (连线ID: ${c.id})</div>`;
+    });
+    html += `</div>`;
+  }
+
+  propContent.innerHTML = html;
+
+  // Bind data textarea change events
+  const dataTA = propContent.querySelector('.prop-data');
+  if (dataTA) {
+    dataTA.addEventListener('input', function() {
+      const nid = parseInt(this.getAttribute('data-node-id'));
+      updateNodeProperty(nid, 'data', this.value);
+    });
+  }
+}
+
+function updateNodeProperty(nodeId, prop, value) {
+  const node = getNodeById(nodeId);
+  if (!node) return;
+  node[prop] = value;
+  renderNode(node);
+  drawAllConnections();
+  updateXML();
+  updateMinimap();
+}
+
+function updateNodePosition(nodeId, axis, value) {
+  const node = getNodeById(nodeId);
+  if (!node || isNaN(value)) return;
+  node[axis] = value;
+  const el = document.querySelector(`.canvas-node[data-id="${nodeId}"]`);
+  if (el) {
+    el.style[axis === 'x' ? 'left' : 'top'] = value + 'px';
+  }
+  drawAllConnections();
+  updateMinimap();
+}
+
+// ----- XML Generation -----
+
+// Module-level state for data variable assignments during expression generation
+let _dataVarMap = {};       // nodeId -> varName
+let _dataAssignments = [];  // [{ varName, dataJson }]
+
+// Import data variables (varName -> dataJson), populated during import
+let _importDataVars = {};
+
+// Collect nodes with data reachable from a start node and assign variable names
+function collectDataNodes(startNodeId) {
+  _dataVarMap = {};
+  _dataAssignments = [];
+  const visited = new Set();
+  const stack = [startNodeId];
+  let counter = 0;
+
+  while (stack.length > 0) {
+    const nid = stack.pop();
+    if (visited.has(nid)) continue;
+    visited.add(nid);
+
+    const node = getNodeById(nid);
+    if (!node || node.type === 'end') continue;
+
+    if (node.type !== 'start' && node.data && node.data.trim()) {
+      const varName = counter === 0 ? 'cmpData' : 'cmpData' + (counter + 1);
+      _dataVarMap[nid] = varName;
+      _dataAssignments.push({ varName, dataJson: node.data.trim() });
+      counter++;
+    }
+
+    // Follow outgoing connections
+    const outConns = state.connections.filter(c => c.from === nid);
+    outConns.forEach(c => stack.push(c.to));
+  }
+}
+
+// Build the expression for a single node (just the node itself, no following chain)
+// Junction nodes (empty-label normal nodes) are skipped in expression building
+function buildNodeExpr(node) {
+  const dataVar = _dataVarMap[node.id];
+
+  switch (node.type) {
+    case 'start': return null;
+    case 'end': return null;
+    case 'normal':
+      // Junction nodes have empty label - skip them
+      if (!node.label || node.label === '') return null;
+      return dataVar ? `${node.label}.data(${dataVar})` : node.label;
+    case 'switch':
+      return dataVar
+        ? `SWITCH(${node.expression || 'x'}).data(${dataVar})`
+        : `SWITCH(${node.expression || 'x'})`;
+    case 'if':
+      return dataVar
+        ? `IF(${node.expression || 'x'}).data(${dataVar})`
+        : `IF(${node.expression || 'x'})`;
+    case 'for':
+      return dataVar
+        ? `FOR(${node.expression || '3'}).data(${dataVar})`
+        : `FOR(${node.expression || '3'})`;
+    case 'while':
+      return dataVar
+        ? `WHILE(${node.expression || 'w'}).data(${dataVar})`
+        : `WHILE(${node.expression || 'w'})`;
+    default:
+      return dataVar ? `${node.label || 'Node' + node.id}.data(${dataVar})` : (node.label || 'Node' + node.id);
+  }
+}
+
+// Collect all nodes reachable from startId by following outgoing connections.
+// Returns a Set of node IDs.
+function reachableFrom(startId) {
+  const result = new Set();
+  const queue = [startId];
+  while (queue.length > 0) {
+    const id = queue.shift();
+    if (result.has(id)) continue;
+    result.add(id);
+    const outConns = state.connections.filter(c => c.from === id);
+    outConns.forEach(c => { if (!result.has(c.to)) queue.push(c.to); });
+  }
+  return result;
+}
+
+// Find the first common sink node that all branches starting from branchRoots eventually reach.
+// Returns the common node ID, or null if none found.
+// Excludes end-type nodes from consideration.
+// Prefers junction nodes (nodes with multiple incoming edges) as the convergence point.
+function findCommonSink(branchRoots, stopBefore) {
+  if (branchRoots.length < 2) return null;
+
+  // For each branch root, collect all reachable nodes (excluding end nodes)
+  const reachableSets = branchRoots.map(root => {
+    const s = reachableFrom(root);
+    // Remove end-type nodes
+    for (const id of s) {
+      const n = getNodeById(id);
+      if (n && n.type === 'end') s.delete(id);
+    }
+    if (stopBefore) s.delete(stopBefore);
+    return s;
+  });
+
+  // Find intersection of all reachable sets
+  let common = new Set(reachableSets[0]);
+  for (let i = 1; i < reachableSets.length; i++) {
+    common = new Set([...common].filter(x => reachableSets[i].has(x)));
+  }
+
+  if (common.size === 0) return null;
+
+  // Count incoming edges for each common node (from nodes within the graph, excluding start)
+  function getInDegree(nodeId) {
+    return state.connections.filter(c => c.to === nodeId && c.from !== nodeId).length;
+  }
+
+  // Among common nodes, find junction nodes (in-degree >= 2) first
+  // If multiple junctions, pick the one closest to branch roots
+  const junctions = [...common].filter(id => getInDegree(id) >= 2);
+  if (junctions.length > 0) {
+    // Find earliest junction (one that no other junction can reach)
+    for (const candidate of junctions) {
+      const reachableFromCandidate = reachableFrom(candidate);
+      let isEarliest = true;
+      for (const other of junctions) {
+        if (other !== candidate && reachableFromCandidate.has(other)) {
+          isEarliest = false;
+          break;
+        }
+      }
+      if (isEarliest) return candidate;
+    }
+    return junctions[0];
+  }
+
+  // No junction found, find the earliest common node
+  // The earliest common node is one that no other common node can reach
+  for (const candidate of common) {
+    const reachableFromCandidate = reachableFrom(candidate);
+    let isEarliest = true;
+    for (const other of common) {
+      if (other !== candidate && reachableFromCandidate.has(other)) {
+        isEarliest = false;
+        break;
+      }
+    }
+    if (isEarliest) return candidate;
+  }
+
+  // Fallback: return any common node
+  return [...common][0];
+}
+
+// Build the expression for a subtree, stopping before stopAtNode (exclusive).
+// stopAtNode will be handled by the caller (placed after WHEN).
+// Returns an array of expression parts that should be joined in a THEN().
+function buildSubtreeParts(nodeId, stopAtNode, visited) {
+  if (nodeId === stopAtNode) return [];
+  if (visited.has(nodeId)) return [];
+  visited.add(nodeId);
+
+  const node = getNodeById(nodeId);
+  if (!node || node.type === 'end') return [];
+
+  // Junction nodes (empty-label normal nodes) are transparent:
+  // they pass through to their outgoing connections without generating an expression.
+  const isJunction = (node.type === 'normal' && (!node.label || node.label === ''));
+  if (isJunction) {
+    const outConns = state.connections.filter(c => c.from === nodeId);
+    if (outConns.length === 0) return [];
+    // Multiple outputs from a junction is unusual, but handle by treating as parallel
+    if (outConns.length === 1) {
+      return buildSubtreeParts(outConns[0].to, stopAtNode, new Set(visited));
+    }
+    // Multiple outputs: treat like a parallel node (WHEN)
+    const branchRoots = outConns.map(c => c.to);
+    const commonSink = findCommonSink(branchRoots, stopAtNode);
+    const children = [];
+    outConns.forEach(conn => {
+      const childVisited = new Set(visited);
+      const childParts = buildSubtreeParts(conn.to, commonSink || stopAtNode, childVisited);
+      if (childParts.length > 0) {
+        children.push(childParts.length === 1 ? childParts[0] : `THEN(${childParts.join(', ')})`);
+      }
+    });
+    let whenExpr = null;
+    if (children.length === 1) whenExpr = children[0];
+    else if (children.length > 1) whenExpr = `WHEN(${children.join(', ')})`;
+    if (commonSink) {
+      const afterParts = buildSubtreeParts(commonSink, stopAtNode, new Set(visited));
+      if (whenExpr) return [whenExpr, ...afterParts];
+      return afterParts;
+    }
+    return whenExpr ? [whenExpr] : [];
+  }
+
+  const outConns = state.connections.filter(c => c.from === nodeId);
+
+  // Special nodes: SWITCH/IF/FOR/WHILE
+  if (['switch', 'if', 'for', 'while'].includes(node.type)) {
+    let specialExpr;
+
+    if (node.type === 'switch' || node.type === 'if') {
+      // These can have multiple outputs that may converge
+      const branchRoots = outConns.map(c => c.to);
+      const commonSink = findCommonSink(branchRoots, stopAtNode);
+
+      const children = [];
+      outConns.forEach(conn => {
+        const childVisited = new Set(visited);
+        const childParts = buildSubtreeParts(conn.to, commonSink || stopAtNode, childVisited);
+        if (childParts.length > 0) children.push(childParts.join(', '));
+      });
+
+      if (node.type === 'switch') {
+        const dataVar = _dataVarMap[node.id];
+        const dataSuffix = dataVar ? `.data(${dataVar})` : '';
+        specialExpr = children.length > 0
+          ? `SWITCH(${node.expression || 'x'})${dataSuffix}.to(${children.join(', ')})`
+          : `SWITCH(${node.expression || 'x'})${dataSuffix}`;
+      } else {
+        const trueBranch = children[0] || '';
+        const falseBranch = children[1] || '';
+        const dataVar = _dataVarMap[node.id];
+        const dataSuffix = dataVar ? `.data(${dataVar})` : '';
+        specialExpr = `IF(${node.expression || 'x'}, ${trueBranch}, ${falseBranch})${dataSuffix}`;
+      }
+
+      // Include afterParts if commonSink exists.
+      // If commonSink is a junction, it will be transparent and continue to the next node.
+      if (commonSink) {
+        const afterParts = buildSubtreeParts(commonSink, stopAtNode, new Set(visited));
+        return [specialExpr, ...afterParts];
+      }
+      return [specialExpr];
+    }
+
+    // FOR/WHILE: single output
+    let doBody = '';
+    if (outConns.length > 0) {
+      const childVisited = new Set(visited);
+      const childParts = buildSubtreeParts(outConns[0].to, stopAtNode, childVisited);
+      doBody = childParts.join(', ');
+    }
+
+    const dataVar = _dataVarMap[node.id];
+    const dataSuffix = dataVar ? `.data(${dataVar})` : '';
+
+    if (node.type === 'for') {
+      specialExpr = doBody ? `FOR(${node.expression || '3'})${dataSuffix}.DO(${doBody})` : `FOR(${node.expression || '3'})${dataSuffix}.DO()`;
+    } else {
+      specialExpr = doBody ? `WHILE(${node.expression || 'w'})${dataSuffix}.DO(${doBody})` : `WHILE(${node.expression || 'w'})${dataSuffix}.DO()`;
+    }
+    return [specialExpr];
+  }
+
+  // Normal/start node
+  if (outConns.length === 0) {
+    if (node.type === 'start') return [];
+    const expr = buildNodeExpr(node);
+    return expr ? [expr] : [];
+  }
+
+  if (outConns.length === 1) {
+    const nextParts = buildSubtreeParts(outConns[0].to, stopAtNode, new Set(visited));
+    if (node.type === 'start') return nextParts;
+    const thisExpr = buildNodeExpr(node);
+    if (!thisExpr) return nextParts;
+    return [thisExpr, ...nextParts];
+  }
+
+  // Multiple outputs → parallel branches with common sink detection
+  const branchRoots = outConns.map(c => c.to);
+  const commonSink = findCommonSink(branchRoots, stopAtNode);
+
+  const children = [];
+  outConns.forEach(conn => {
+    const childVisited = new Set(visited);
+    const childParts = buildSubtreeParts(conn.to, commonSink || stopAtNode, childVisited);
+    if (childParts.length > 0) {
+      children.push(childParts.length === 1 ? childParts[0] : `THEN(${childParts.join(', ')})`);
+    }
+  });
+
+  if (node.type === 'start') {
+    let whenExpr;
+    if (children.length === 0) {
+      whenExpr = null;
+    } else if (children.length === 1) {
+      whenExpr = children[0];
+    } else {
+      whenExpr = `WHEN(${children.join(', ')})`;
+    }
+    if (commonSink) {
+      const afterParts = buildSubtreeParts(commonSink, stopAtNode, new Set(visited));
+      if (whenExpr) {
+        return [whenExpr, ...afterParts];
+      }
+      return afterParts;
+    }
+    return whenExpr ? [whenExpr] : [];
+  }
+
+  const thisExpr = buildNodeExpr(node);
+  if (!thisExpr) {
+    // node with no expression but multiple outputs (shouldn't happen for non-junction)
+    if (children.length === 0) return [];
+    if (commonSink) {
+      const afterParts = buildSubtreeParts(commonSink, stopAtNode, new Set(visited));
+      const whenExpr = children.length === 1 ? children[0] : `WHEN(${children.join(', ')})`;
+      return [whenExpr, ...afterParts];
+    }
+    return children;
+  }
+
+  if (children.length === 0) return [thisExpr];
+
+  let whenExpr;
+  if (children.length === 1) {
+    whenExpr = children[0];
+  } else {
+    whenExpr = `WHEN(${children.join(', ')})`;
+  }
+
+  if (commonSink) {
+    const afterParts = buildSubtreeParts(commonSink, stopAtNode, new Set(visited));
+    return [thisExpr, whenExpr, ...afterParts];
+  }
+
+  return [thisExpr, whenExpr];
+}
+
+// Check if a common sink node is a junction (empty-label normal node)
+function isCommonSinkJunction(nodeId) {
+  const n = getNodeById(nodeId);
+  return n && n.type === 'normal' && (!n.label || n.label === '');
+}
+
+// Wrap a list of expression parts into the final expression string.
+// Single part: return as-is. Multiple parts: wrap in THEN(...).
+function partsToExpr(parts) {
+  if (parts.length === 0) return null;
+  if (parts.length === 1) return parts[0];
+  return `THEN(${parts.join(', ')})`;
+}
+
+// Build the expression for a subtree, stopping before stopAtNode (exclusive).
+function buildSubtreeExpr(nodeId, stopAtNode, visited) {
+  const parts = buildSubtreeParts(nodeId, stopAtNode, visited);
+  return partsToExpr(parts);
+}
+
+function generateEL(startNodeId) {
+  // If specific start node ID is given, use it
+  let rootId;
+  if (startNodeId) {
+    const sn = getNodeById(startNodeId);
+    if (sn && sn.type === 'start') {
+      rootId = sn.id;
+    }
+  }
+
+  if (!rootId) {
+    // Find first start node
+    const startNode = state.nodes.find(n => n.type === 'start');
+    if (startNode) {
+      rootId = startNode.id;
+    } else {
+      // Try to find any node without incoming connections as root
+      const allTargetIds = new Set(state.connections.map(c => c.to));
+      const roots = state.nodes.filter(n => !allTargetIds.has(n.id) && n.type !== 'end');
+      if (roots.length === 0) return { expr: '', dataAssignmentStr: '' };
+      rootId = roots[0].id;
+    }
+  }
+
+  // Collect data nodes and assign variable names
+  collectDataNodes(rootId);
+
+  const visited = new Set();
+  const expr = buildSubtreeExpr(rootId, null, visited) || '';
+
+  // Build data assignment strings
+  let dataAssignmentStr = '';
+  _dataAssignments.forEach(d => {
+    dataAssignmentStr += `        ${d.varName} = '${d.dataJson.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}';\n`;
+  });
+
+  return { expr, dataAssignmentStr };
+}
+
+function generateXML() {
+  const startNodes = state.nodes.filter(n => n.type === 'start');
+
+  if (startNodes.length === 0) {
+    return '<?xml version="1.0" encoding="UTF-8"?>\n<flow>\n</flow>';
+  }
+
+  let chainsXml = '';
+  startNodes.forEach(sn => {
+    const result = generateEL(sn.id);
+    const dataStr = result.dataAssignmentStr || '';
+    const elExpr = result.expr || '';
+    const inner = (dataStr || elExpr)
+      ? dataStr + (elExpr ? `    ${elExpr};` : '')
+      : '    ';
+    const chainName = sn.label || 'chain' + sn.id;
+    chainsXml += `\n    <chain name="${chainName}">\n${inner}\n    </chain>`;
+  });
+
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<flow>${chainsXml}\n</flow>`;
+}
+
+function updateXML() {
+  xmlContent.textContent = generateXML();
+}
+
+// ----- Toolbar Actions -----
+function clearCanvas() {
+  if (state.nodes.length > 0 && !confirm('确定清空画布？所有节点和连线将被删除。')) return;
+  state.nodes = [];
+  state.connections = [];
+  state.selectedNodeId = null;
+  state.selectedConnectionId = null;
+  state.nextId = 1;
+  canvas.innerHTML = '';
+  canvas.appendChild(svgLayer);
+  svgLayer.innerHTML = '';
+  drawAllConnections();
+  updateXML();
+  updatePropertiesPanel(null);
+  updateMinimap();
+  showToast('画布已清空');
+}
+
+function exportXML() {
+  const xml = generateXML();
+  const blob = new Blob([xml], { type: 'text/xml' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'el_rule.xml';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('XML已导出');
+}
+
+function importExample() {
+  clearCanvas();
+
+  // Example: THEN(A, WHEN(THEN(B, C), THEN(SWITCH(G).to(E,F), N)), Z)
+  // Visual: Start→A →(2 branches)→ B→C  and  SWITCH(G)→(E,F)→N → Z→End
+  //
+  // A outputs to 2 targets = WHEN at A level
+  // Branch 1: B→C = THEN(B,C)
+  // Branch 2: SWITCH(G)→E,F = SWITCH(G).to(E,F), then →N = THEN(..., N)
+  // Both branches converge to Z, then End
+
+  const nodes = [
+    { type: 'start', label: '开始', x: 50, y: 250 },
+    { type: 'normal', label: 'A', x: 180, y: 250 },
+    // Branch 1: B → C
+    { type: 'normal', label: 'B', x: 360, y: 120 },
+    { type: 'normal', label: 'C', x: 520, y: 120 },
+    // Branch 2: SWITCH(G) → E, F → N
+    { type: 'switch', label: 'G', x: 360, y: 380, expression: 'G' },
+    { type: 'normal', label: 'E', x: 520, y: 320 },
+    { type: 'normal', label: 'F', x: 520, y: 440 },
+    { type: 'normal', label: 'N', x: 680, y: 380 },
+    // Convergence: Z
+    { type: 'normal', label: 'Z', x: 840, y: 250 },
+    { type: 'end', label: '结束', x: 980, y: 250 },
+  ];
+
+  const connections = [
+    // Start → A
+    { from: 1, to: 2 },
+    // A → B (branch 1)
+    { from: 2, to: 3 },
+    // B → C
+    { from: 3, to: 4 },
+    // A → SWITCH (branch 2)
+    { from: 2, to: 5 },
+    // SWITCH → E, F (parallel outputs)
+    { from: 5, to: 6 },
+    { from: 5, to: 7 },
+    // E → N, F → N (both converge)
+    { from: 6, to: 8 },
+    { from: 7, to: 8 },
+    // C → Z (branch 1 convergence)
+    { from: 4, to: 9 },
+    // N → Z (branch 2 convergence)
+    { from: 8, to: 9 },
+    // Z → End
+    { from: 9, to: 10 },
+  ];
+
+  state.nextId = 1;
+
+  nodes.forEach(n => {
+    const node = { ...n, id: state.nextId++ };
+    state.nodes.push(node);
+  });
+
+  connections.forEach(c => {
+    state.connections.push({
+      id: state.nextId++,
+      from: c.from,
+      to: c.to,
+    });
+  });
+
+  renderAllNodes();
+  updateXML();
+  updatePropertiesPanel(null);
+  showToast('示例已导入');
+}
+
+function autoLayout() {
+  if (state.nodes.length === 0) return;
+
+  // Simple layered layout
+  const startNode = state.nodes.find(n => n.type === 'start');
+  const allTargetIds = new Set(state.connections.map(c => c.to));
+  const roots = state.nodes.filter(n => !allTargetIds.has(n.id));
+
+  const levels = new Map();
+  const visited = new Set();
+
+  function assignLevel(nodeId, level) {
+    if (visited.has(nodeId)) return;
+    visited.add(nodeId);
+    if (!levels.has(nodeId) || levels.get(nodeId) < level) {
+      levels.set(nodeId, level);
+    }
+    const outConns = state.connections.filter(c => c.from === nodeId);
+    outConns.forEach(c => assignLevel(c.to, level + 1));
+  }
+
+  const startId = startNode ? startNode.id : (roots[0]?.id || state.nodes[0]?.id);
+  if (startId) assignLevel(startId, 0);
+
+  // Process any unvisited nodes
+  state.nodes.forEach(n => {
+    if (!visited.has(n.id)) {
+      assignLevel(n.id, 0);
+    }
+  });
+
+  const levelGroups = new Map();
+  levels.forEach((level, nodeId) => {
+    if (!levelGroups.has(level)) levelGroups.set(level, []);
+    levelGroups.get(level).push(nodeId);
+  });
+
+  const xSpacing = 160;
+  const ySpacing = 80;
+  const startX = 60;
+  const startY = 60;
+
+  levelGroups.forEach((nodeIds, level) => {
+    nodeIds.forEach((nodeId, index) => {
+      const node = getNodeById(nodeId);
+      if (node) {
+        node.x = startX + level * xSpacing;
+        node.y = startY + index * ySpacing;
+        const el = document.querySelector(`.canvas-node[data-id="${nodeId}"]`);
+        if (el) {
+          el.style.left = node.x + 'px';
+          el.style.top = node.y + 'px';
+        }
+      }
+    });
+  });
+
+  drawAllConnections();
+  updateMinimap();
+  showToast('自动布局完成');
+}
+
+function copyXML() {
+  const xml = generateXML();
+  navigator.clipboard.writeText(xml).then(() => {
+    copyBtn.textContent = '已复制';
+    copyBtn.classList.add('copied');
+    setTimeout(() => {
+      copyBtn.textContent = '复制';
+      copyBtn.classList.remove('copied');
+    }, 2000);
+    showToast('XML已复制到剪贴板');
+  }).catch(() => {
+    showToast('复制失败，请手动选择');
+  });
+}
+
+// ----- Screen to Canvas Coordinate Conversion -----
+// Convert viewport client coordinates to canvas (world) coordinates,
+// accounting for canvas pan (offsetX/Y) and zoom (scale).
+function screenToCanvas(clientX, clientY) {
+  const wrapperRect = canvasWrapper.getBoundingClientRect();
+  return {
+    x: (clientX - wrapperRect.left - state.canvasOffset.x) / state.canvasScale,
+    y: (clientY - wrapperRect.top - state.canvasOffset.y) / state.canvasScale,
+  };
+}
+
+// ----- Canvas Transform -----
+function applyCanvasTransform() {
+  const s = state.canvasScale;
+  canvas.style.width = state.canvasWidth + 'px';
+  canvas.style.height = state.canvasHeight + 'px';
+  canvas.style.transform = `translate(${state.canvasOffset.x}px, ${state.canvasOffset.y}px) scale(${s})`;
+  drawAllConnections();
+  updateMinimap();
+}
+
+// ----- Zoom via Mouse Wheel (Ctrl+Wheel) -----
+canvasWrapper.addEventListener('wheel', (e) => {
+  if (!e.ctrlKey) return; // Only zoom when Ctrl is held
+  e.preventDefault();
+  const scale = state.canvasScale;
+  const delta = e.deltaY > 0 ? -0.1 : 0.1;
+  const newScale = Math.max(0.2, Math.min(3, scale + delta));
+  if (newScale === scale) return;
+
+  // Zoom towards cursor position
+  const rect = canvasWrapper.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+
+  // World position under cursor (before zoom)
+  const worldX = (mx - state.canvasOffset.x) / scale;
+  const worldY = (my - state.canvasOffset.y) / scale;
+
+  state.canvasScale = newScale;
+
+  // Adjust offset so world position under cursor stays fixed
+  state.canvasOffset.x = mx - worldX * newScale;
+  state.canvasOffset.y = my - worldY * newScale;
+
+  applyCanvasTransform();
+}, { passive: false });
+
+// Initial canvas size
+function initCanvasSize() {
+  canvas.style.width = state.canvasWidth + 'px';
+  canvas.style.height = state.canvasHeight + 'px';
+}
+initCanvasSize();
+
+// ----- Minimap -----
+function updateMinimap() {
+  const ctx = minimapCanvas.getContext('2d');
+  const w = minimapCanvas.parentElement.clientWidth;
+  const h = minimapCanvas.parentElement.clientHeight;
+  minimapCanvas.width = w;
+  minimapCanvas.height = h;
+
+  ctx.clearRect(0, 0, w, h);
+
+  if (state.nodes.length === 0) return;
+
+  // Find bounds
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  state.nodes.forEach(n => {
+    minX = Math.min(minX, n.x);
+    minY = Math.min(minY, n.y);
+    maxX = Math.max(maxX, n.x + 100);
+    maxY = Math.max(maxY, n.y + 60);
+  });
+
+  const padding = 40;
+  const scaleX = w / (maxX - minX + padding * 2);
+  const scaleY = h / (maxY - minY + padding * 2);
+  const scale = Math.min(scaleX, scaleY);
+
+  const offsetX = (w - (maxX - minX) * scale) / 2 - minX * scale;
+  const offsetY = (h - (maxY - minY) * scale) / 2 - minY * scale;
+
+  // Draw connections
+  state.connections.forEach(c => {
+    const from = getNodeById(c.from);
+    const to = getNodeById(c.to);
+    if (!from || !to) return;
+    ctx.strokeStyle = '#93C5FD';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(from.x * scale + 50 * scale + offsetX, from.y * scale + 30 * scale + offsetY);
+    ctx.lineTo(to.x * scale + 50 * scale + offsetX, to.y * scale + 30 * scale + offsetY);
+    ctx.stroke();
+  });
+
+  // Draw nodes
+  state.nodes.forEach(n => {
+    const colors = {
+      start: '#10B981', end: '#EF4444', normal: '#3B82F6',
+      switch: '#EC4899', if: '#06B6D4', for: '#84CC16', while: '#F97316',
+    };
+    ctx.fillStyle = colors[n.type] || '#3B82F6';
+    ctx.fillRect(n.x * scale + offsetX, n.y * scale + offsetY, 100 * scale, 60 * scale);
+  });
+}
+
+// ----- Keyboard Shortcuts -----
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+
+  if (e.key === 'Delete' || e.key === 'Backspace') {
+    if (state.selectedNodeId) {
+      deleteNode(state.selectedNodeId);
+    } else if (state.selectedConnectionId) {
+      deleteConnection(state.selectedConnectionId);
+    }
+  }
+
+  if (e.ctrlKey && e.key === 'z') {
+    e.preventDefault();
+    showToast('撤销功能开发中');
+  }
+
+  if (e.ctrlKey && e.key === 's') {
+    e.preventDefault();
+    exportXML();
+  }
+});
+
+// ----- Window Resize -----
+window.addEventListener('resize', () => {
+  drawAllConnections();
+  updateMinimap();
+});
+
+// ----- EL Expression Parser -----
+// Parse EL expression string into nodes and connections for visualization
+
+// Simple tokenizer: splits EL expression into tokens
+// Tokens: keyword(THEN|WHEN|SWITCH|IF|FOR|WHILE), DOT, TO, DO, COMMA, LPAREN, RPAREN, IDENTIFIER, SEMICOLON
+function tokenize(expr) {
+  const tokens = [];
+  let i = 0;
+  while (i < expr.length) {
+    // Skip whitespace
+    if (/\s/.test(expr[i])) { i++; continue; }
+    // Match keywords/identifiers
+    if (/[A-Za-z_]/i.test(expr[i])) {
+      let word = '';
+      while (i < expr.length && /[A-Za-z0-9_]/i.test(expr[i])) {
+        word += expr[i++];
+      }
+      const upper = word.toUpperCase();
+      if (['THEN', 'WHEN', 'SWITCH', 'IF', 'FOR', 'WHILE', 'DO', 'TO'].includes(upper)) {
+        tokens.push({ type: upper, value: word });
+      } else {
+        tokens.push({ type: 'IDENTIFIER', value: word });
+      }
+      continue;
+    }
+    // Punctuation
+    if (expr[i] === '(') { tokens.push({ type: 'LPAREN', value: '(' }); i++; continue; }
+    if (expr[i] === ')') { tokens.push({ type: 'RPAREN', value: ')' }); i++; continue; }
+    if (expr[i] === ',') { tokens.push({ type: 'COMMA', value: ',' }); i++; continue; }
+    if (expr[i] === ';') { tokens.push({ type: 'SEMICOLON', value: ';' }); i++; continue; }
+    if (expr[i] === '.') { tokens.push({ type: 'DOT', value: '.' }); i++; continue; }
+    i++; // Skip unknown chars
+  }
+  return tokens;
+}
+
+// AST node types
+// { type: 'chain', name: string, body: ASTNode }
+// { type: 'then', children: ASTNode[] }
+// { type: 'when', children: ASTNode[] }
+// { type: 'switch', expression: string, cases: ASTNode[] }
+// { type: 'if', expression: string, trueBranch: ASTNode, falseBranch: ASTNode }
+// { type: 'for', expression: string, body: ASTNode }
+// { type: 'while', expression: string, body: ASTNode }
+// { type: 'node', label: string }
+
+class Parser {
+  constructor(tokens) {
+    this.tokens = tokens;
+    this.pos = 0;
+  }
+
+  peek() { return this.tokens[this.pos]; }
+
+  consume(expectedType) {
+    const t = this.tokens[this.pos];
+    if (expectedType && t && t.type !== expectedType) {
+      throw new Error(`Expected ${expectedType} but got ${t.type} at position ${this.pos}`);
+    }
+    this.pos++;
+    return t;
+  }
+
+  parseChain() {
+    const name = 'chain1';
+    // skip optional semicolons at start
+    while (this.peek() && this.peek().type === 'SEMICOLON') this.consume();
+    const body = this.parseExpression();
+    while (this.peek() && this.peek().type === 'SEMICOLON') this.consume();
+    return { type: 'chain', name, body };
+  }
+
+  parseExpression() {
+    const t = this.peek();
+    if (!t) return null;
+    if (['THEN', 'WHEN', 'SWITCH', 'IF', 'FOR', 'WHILE'].includes(t.type)) {
+      return this.parseKeywordExpr();
+    }
+    if (t.type === 'IDENTIFIER') {
+      return this.parseIdentifier();
+    }
+    return null;
+  }
+
+  parseKeywordExpr() {
+    const kw = this.consume();
+    const type = kw.type;
+
+    if (type === 'THEN' || type === 'WHEN') {
+      this.consume('LPAREN');
+      const children = [];
+      while (this.peek() && this.peek().type !== 'RPAREN') {
+        if (this.peek().type === 'COMMA') { this.consume(); continue; }
+        const child = this.parseExpression();
+        if (child) children.push(child);
+        else break;
+      }
+      this.consume('RPAREN');
+      return { type: type.toLowerCase(), children };
+    }
+
+    if (type === 'SWITCH' || type === 'IF') {
+      this.consume('LPAREN');
+      let expression = '';
+      while (this.peek() && this.peek().type !== 'RPAREN') {
+        if (this.peek().type === 'COMMA') { this.consume(); expression += ', '; continue; }
+        expression += this.consume().value;
+      }
+      this.consume('RPAREN');
+
+      if (type === 'SWITCH') {
+        // SWITCH(x).to(A, B, ...)
+        const cases = [];
+        if (this.peek() && this.peek().type === 'DOT') {
+          this.consume('DOT');
+          const nextTok = this.peek();
+          if (nextTok && nextTok.type === 'IDENTIFIER' && nextTok.value.toLowerCase() === 'data') {
+            // .data(varName) before .to()
+            this.consume(); // 'data'
+            this.consume('LPAREN');
+            let dataRef = null;
+            if (this.peek() && this.peek().type !== 'RPAREN') {
+              dataRef = this.consume().value;
+            }
+            this.consume('RPAREN');
+            // Continue with .to() if present
+            if (this.peek() && this.peek().type === 'DOT') {
+              this.consume('DOT');
+              this.consume('TO');
+              this.consume('LPAREN');
+              while (this.peek() && this.peek().type !== 'RPAREN') {
+                if (this.peek().type === 'COMMA') { this.consume(); continue; }
+                const child = this.parseExpression();
+                if (child) cases.push(child);
+                else break;
+              }
+              this.consume('RPAREN');
+            }
+            return { type: 'switch', expression, cases, dataRef };
+          } else {
+            this.consume('TO');
+            this.consume('LPAREN');
+            while (this.peek() && this.peek().type !== 'RPAREN') {
+              if (this.peek().type === 'COMMA') { this.consume(); continue; }
+              const child = this.parseExpression();
+              if (child) cases.push(child);
+              else break;
+            }
+            this.consume('RPAREN');
+          }
+        }
+        // Check for .data() after .to()
+        let dataRef = null;
+        if (this.peek() && this.peek().type === 'DOT') {
+          this.consume('DOT');
+          const methodTok = this.peek();
+          if (methodTok && methodTok.type === 'IDENTIFIER' && methodTok.value.toLowerCase() === 'data') {
+            this.consume(); // 'data'
+            this.consume('LPAREN');
+            if (this.peek() && this.peek().type !== 'RPAREN') {
+              dataRef = this.consume().value;
+            }
+            this.consume('RPAREN');
+          }
+        }
+        return { type: 'switch', expression, cases, dataRef };
+      } else {
+        // IF(x, trueBranch, falseBranch)
+        // Check for .data() after IF parens
+        let dataRef = null;
+        if (this.peek() && this.peek().type === 'DOT') {
+          this.consume('DOT');
+          const methodTok = this.peek();
+          if (methodTok && methodTok.type === 'IDENTIFIER' && methodTok.value.toLowerCase() === 'data') {
+            this.consume(); // 'data'
+            this.consume('LPAREN');
+            if (this.peek() && this.peek().type !== 'RPAREN') {
+              dataRef = this.consume().value;
+            }
+            this.consume('RPAREN');
+          }
+        }
+        const result = this.parseIfFromExpression(expression, type);
+        if (dataRef) result.dataRef = dataRef;
+        return result;
+      }
+    }
+
+    if (type === 'FOR' || type === 'WHILE') {
+      this.consume('LPAREN');
+      let expression = '';
+      while (this.peek() && this.peek().type !== 'RPAREN') {
+        expression += this.consume().value;
+      }
+      this.consume('RPAREN');
+
+      let body = null;
+      let dataRef = null;
+
+      // Check for .data() or .DO()
+      if (this.peek() && this.peek().type === 'DOT') {
+        this.consume('DOT');
+        const methodTok = this.peek();
+        if (methodTok && methodTok.type === 'IDENTIFIER' && methodTok.value.toLowerCase() === 'data') {
+          // .data(varName)
+          this.consume(); // 'data'
+          this.consume('LPAREN');
+          if (this.peek() && this.peek().type !== 'RPAREN') {
+            dataRef = this.consume().value;
+          }
+          this.consume('RPAREN');
+          // Check for .DO() after .data()
+          if (this.peek() && this.peek().type === 'DOT') {
+            this.consume('DOT');
+            this.consume('DO');
+            this.consume('LPAREN');
+            if (this.peek() && this.peek().type !== 'RPAREN') {
+              body = this.parseExpression();
+            }
+            this.consume('RPAREN');
+          }
+        } else {
+          // .DO(body)
+          this.consume('DO');
+          this.consume('LPAREN');
+          if (this.peek() && this.peek().type !== 'RPAREN') {
+            body = this.parseExpression();
+          }
+          this.consume('RPAREN');
+        }
+      }
+
+      // Check for .data() after .DO()
+      if (!dataRef && this.peek() && this.peek().type === 'DOT') {
+        this.consume('DOT');
+        const methodTok = this.peek();
+        if (methodTok && methodTok.type === 'IDENTIFIER' && methodTok.value.toLowerCase() === 'data') {
+          this.consume(); // 'data'
+          this.consume('LPAREN');
+          if (this.peek() && this.peek().type !== 'RPAREN') {
+            dataRef = this.consume().value;
+          }
+          this.consume('RPAREN');
+        }
+      }
+
+      return { type: type.toLowerCase(), expression, body, dataRef };
+    }
+  }
+
+  parseIfFromExpression(expression, type) {
+    // IF(x, trueExpr, falseExpr)
+    // expression contains "x, trueExpr, falseExpr" split by top-level commas
+    const parts = splitTopLevel(expression);
+    const condExpr = parts[0] ? parts[0].trim() : '';
+    let trueBranch = null;
+    let falseBranch = null;
+    if (parts.length >= 2 && parts[1].trim()) {
+      trueBranch = parseEL(parts[1].trim());
+    }
+    if (parts.length >= 3 && parts[2].trim()) {
+      falseBranch = parseEL(parts[2].trim());
+    }
+    return { type: 'if', expression: condExpr, trueBranch, falseBranch };
+  }
+
+  parseIdentifier() {
+    const t = this.consume();
+    const label = t.value;
+
+    // Check for .data(varName) pattern
+    let dataRef = null;
+    if (this.peek() && this.peek().type === 'DOT') {
+      this.consume('DOT');
+      const methodTok = this.peek();
+      if (methodTok && methodTok.type === 'IDENTIFIER' && methodTok.value.toLowerCase() === 'data') {
+        this.consume(); // consume 'data'
+        this.consume('LPAREN');
+        if (this.peek() && this.peek().type !== 'RPAREN') {
+          dataRef = this.consume().value;
+        }
+        this.consume('RPAREN');
+      } else {
+        // Unknown method, backtrack by pushing tokens back - skip for now
+        // For safety, just return plain node
+      }
+    }
+
+    return { type: 'node', label, dataRef };
+  }
+}
+
+// Improved IF parsing: re-tokenize IF expressions properly
+function parseIFSpecial(expr) {
+  // expr is like "x, trueBody, falseBody" after IF(
+  // We need to split by top-level commas
+  const parts = splitTopLevel(expr);
+  if (parts.length >= 1) {
+    const condExpr = parts[0].trim();
+    let trueBranch = null, falseBranch = null;
+    if (parts.length >= 2) {
+      trueBranch = parseEL(parts[1].trim());
+    }
+    if (parts.length >= 3) {
+      falseBranch = parseEL(parts[2].trim());
+    }
+    return { type: 'if', expression: condExpr, trueBranch, falseBranch };
+  }
+  return { type: 'if', expression: expr, trueBranch: null, falseBranch: null };
+}
+
+// Split string by top-level commas (not inside parens)
+function splitTopLevel(s) {
+  const parts = [];
+  let depth = 0;
+  let current = '';
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    if (ch === '(') { depth++; current += ch; }
+    else if (ch === ')') { depth--; current += ch; }
+    else if (ch === ',' && depth === 0) {
+      parts.push(current);
+      current = '';
+    } else {
+      current += ch;
+    }
+  }
+  if (current.trim()) parts.push(current);
+  return parts;
+}
+
+function parseEL(exprStr) {
+  if (!exprStr || !exprStr.trim()) return null;
+  const tokens = tokenize(exprStr);
+  if (tokens.length === 0) return null;
+
+  // Handle IF specially
+  // IF(cond, true, false) pattern
+  const ifMatch = exprStr.match(/^\s*IF\s*\(/i);
+  if (ifMatch) {
+    // Extract content inside IF(...)
+    const content = extractParenContent(exprStr, ifMatch[0].length - 1);
+    if (content !== null) {
+      return parseIFSpecial(content);
+    }
+  }
+
+  const parser = new Parser(tokens);
+  return parser.parseExpression();
+}
+
+// Extract content inside first pair of parentheses
+function extractParenContent(s, startIdx) {
+  let depth = 0;
+  for (let i = startIdx; i < s.length; i++) {
+    if (s[i] === '(') depth++;
+    else if (s[i] === ')') {
+      depth--;
+      if (depth === 0) {
+        return s.substring(startIdx + 1, i);
+      }
+    }
+  }
+  return null;
+}
+
+// ----- AST to Nodes & Connections -----
+// Convert parsed EL AST into state.nodes and state.connections
+//
+// Key principle: Every node/subtree returns its "exit" ID — the node from which
+// the next sibling connects. For branching structures (WHEN/SWITCH/IF), all
+// branch tails converge to a shared junction node, and that junction is the exit.
+let elLayoutCounter = { x: 60, y: 60 };
+
+function astToGraph(ast, chainName = 'chain1') {
+  state.nodes = [];
+  state.connections = [];
+  state.nextId = 1;
+  elLayoutCounter = { x: 60, y: 60 };
+
+  if (!ast) return;
+
+  // Start node - use chain name as label
+  const startLabel = chainName || 'chain1';
+  const startId = generateId();
+  state.nodes.push({ id: startId, type: 'start', label: startLabel, x: 50, y: 250, expression: '' });
+
+  if (ast.type === 'chain') {
+    const exitResult = processASTNode(ast.body, startId, 250);
+    // End node — connect from all exit points
+    if (exitResult) {
+      const endNodeId = generateId();
+      state.nodes.push({ id: endNodeId, type: 'end', label: '结束', x: elLayoutCounter.x + 140, y: 250, expression: '' });
+      const exitIds = Array.isArray(exitResult) ? exitResult : [exitResult];
+      exitIds.forEach(eid => {
+        state.connections.push({ id: generateId(), from: eid, to: endNodeId });
+      });
+    }
+  } else {
+    processASTNode(ast, startId, 250);
+  }
+}
+
+function processASTNode(astNode, fromId, baseY) {
+  if (!astNode) return fromId;
+
+  switch (astNode.type) {
+    case 'then': return processThen(astNode, fromId, baseY);
+    case 'when': return processWhen(astNode, fromId, baseY);
+    case 'switch': return processSwitch(astNode, fromId, baseY);
+    case 'if': return processIf(astNode, fromId, baseY);
+    case 'for': return processFor(astNode, fromId, baseY);
+    case 'while': return processWhile(astNode, fromId, baseY);
+    case 'node': return processSimpleNode(astNode, fromId, baseY);
+    default: return fromId;
+  }
+}
+
+function createNode(type, label, x, y, expression = '', dataRef = null) {
+  const id = generateId();
+  const nodeData = dataRef ? (_importDataVars[dataRef] || '') : '';
+  state.nodes.push({ id, type, label, x, y, expression, data: nodeData });
+  return id;
+}
+
+function connect(fromId, toId) {
+  // Avoid duplicate connections
+  const exists = state.connections.some(c => c.from === fromId && c.to === toId);
+  if (!exists) {
+    state.connections.push({ id: generateId(), from: fromId, to: toId });
+  }
+}
+
+const H_SPACING = 120;
+const V_SPACING = 80;
+
+// THEN: serial chain. Each child's exit feeds the next child's entry.
+// Returns either a single exit ID or an array of exit IDs (for branches).
+function processThen(astNode, fromId, baseY) {
+  let entryId = fromId;
+  let exitId = fromId;
+
+  for (const child of astNode.children) {
+    // If entryId is an array, the next child should connect from ALL of them
+    // (e.g., after SWITCH or WHEN, the next node in THEN gets all branch exits)
+    exitId = processASTNode(child, entryId, baseY);
+    entryId = exitId;
+  }
+
+  return exitId;
+}
+
+// WHEN: parallel branches. Each branch starts from fromId.
+// Returns all branch exit IDs as an array (no junction node).
+// The caller (THEN) connects the next sibling to all branch exits.
+function processWhen(astNode, fromId, baseY) {
+  const branchCount = astNode.children.length;
+  const totalHeight = (branchCount - 1) * V_SPACING;
+  const startY = baseY - totalHeight / 2;
+
+  const branchExits = [];
+  const savedX = elLayoutCounter.x;
+
+  astNode.children.forEach((child, idx) => {
+    elLayoutCounter.x = savedX;
+    const childY = startY + idx * V_SPACING;
+
+    const childExit = processASTNode(child, fromId, childY);
+    if (childExit) {
+      if (Array.isArray(childExit)) {
+        branchExits.push(...childExit);
+      } else {
+        branchExits.push(childExit);
+      }
+    }
+  });
+
+  // Deduplicate
+  const uniqueExits = [...new Set(branchExits)];
+
+  // Find max X among all branch exits
+  let maxExitX = 0;
+  uniqueExits.forEach(eid => {
+    const n = getNodeById(eid);
+    if (n && n.x > maxExitX) maxExitX = n.x;
+  });
+  elLayoutCounter.x = maxExitX + H_SPACING;
+
+  // Return all branch exits directly — no junction node
+  if (uniqueExits.length === 1) return uniqueExits[0];
+  return uniqueExits;
+}
+
+// SWITCH: branching. Switch node → each case.
+// Returns all case exit IDs as an array (no junction node).
+function processSwitch(astNode, fromId, baseY) {
+  const switchId = createNode('switch', 'SWITCH', elLayoutCounter.x, baseY, astNode.expression || 'x', astNode.dataRef || null);
+  if (Array.isArray(fromId)) {
+    fromId.forEach(fid => connect(fid, switchId));
+  } else {
+    connect(fromId, switchId);
+  }
+
+  const caseCount = astNode.cases.length;
+  const totalHeight = (caseCount - 1) * V_SPACING;
+  const startY = baseY - totalHeight / 2;
+  const savedX = elLayoutCounter.x;
+
+  const caseExits = [];
+  astNode.cases.forEach((child, idx) => {
+    elLayoutCounter.x = savedX + H_SPACING;
+    const childY = startY + idx * V_SPACING;
+
+    const caseExit = processASTNode(child, switchId, childY);
+    if (caseExit) {
+      if (Array.isArray(caseExit)) {
+        caseExits.push(...caseExit);
+      } else {
+        caseExits.push(caseExit);
+      }
+    }
+  });
+
+  // Deduplicate
+  const uniqueExits = [...new Set(caseExits)];
+
+  // Find max X among case exits
+  let maxExitX = savedX + H_SPACING;
+  uniqueExits.forEach(eid => {
+    const n = getNodeById(eid);
+    if (n && n.x > maxExitX) maxExitX = n.x;
+  });
+  elLayoutCounter.x = maxExitX + H_SPACING;
+
+  // Return all case exits directly — no junction node
+  if (uniqueExits.length === 1) return uniqueExits[0];
+  return uniqueExits;
+}
+
+// IF: condition → true/false branch
+// Returns all branch exit IDs (no junction node).
+function processIf(astNode, fromId, baseY) {
+  const ifId = createNode('if', 'IF', elLayoutCounter.x, baseY, astNode.expression || 'x', astNode.dataRef || null);
+  if (Array.isArray(fromId)) {
+    fromId.forEach(fid => connect(fid, ifId));
+  } else {
+    connect(fromId, ifId);
+  }
+
+  const savedX = elLayoutCounter.x;
+  const trueY = baseY - V_SPACING / 2;
+  const falseY = baseY + V_SPACING / 2;
+
+  const branchExits = [];
+
+  if (astNode.trueBranch) {
+    elLayoutCounter.x = savedX + H_SPACING;
+    const trueExit = processASTNode(astNode.trueBranch, ifId, trueY);
+    if (trueExit) {
+      if (Array.isArray(trueExit)) branchExits.push(...trueExit);
+      else branchExits.push(trueExit);
+    }
+  }
+
+  if (astNode.falseBranch) {
+    elLayoutCounter.x = savedX + H_SPACING;
+    const falseExit = processASTNode(astNode.falseBranch, ifId, falseY);
+    if (falseExit) {
+      if (Array.isArray(falseExit)) branchExits.push(...falseExit);
+      else branchExits.push(falseExit);
+    }
+  }
+
+  // Deduplicate
+  const uniqueExits = [...new Set(branchExits)];
+
+  let maxExitX = savedX + H_SPACING;
+  uniqueExits.forEach(eid => {
+    const n = getNodeById(eid);
+    if (n && n.x > maxExitX) maxExitX = n.x;
+  });
+  elLayoutCounter.x = maxExitX + H_SPACING;
+
+  if (uniqueExits.length === 0) return ifId;
+  if (uniqueExits.length === 1) return uniqueExits[0];
+  return uniqueExits;
+}
+
+// FOR: loop node → body (no junction node)
+function processFor(astNode, fromId, baseY) {
+  const forId = createNode('for', 'FOR', elLayoutCounter.x, baseY, astNode.expression || '3', astNode.dataRef || null);
+  if (Array.isArray(fromId)) {
+    fromId.forEach(fid => connect(fid, forId));
+  } else {
+    connect(fromId, forId);
+  }
+
+  if (astNode.body) {
+    elLayoutCounter.x += H_SPACING;
+    const bodyExit = processASTNode(astNode.body, forId, baseY);
+    elLayoutCounter.x += H_SPACING;
+    return bodyExit || forId;
+  }
+
+  elLayoutCounter.x += H_SPACING;
+  return forId;
+}
+
+// WHILE: loop node → body (no junction node)
+function processWhile(astNode, fromId, baseY) {
+  const whileId = createNode('while', 'WHILE', elLayoutCounter.x, baseY, astNode.expression || 'w', astNode.dataRef || null);
+  if (Array.isArray(fromId)) {
+    fromId.forEach(fid => connect(fid, whileId));
+  } else {
+    connect(fromId, whileId);
+  }
+
+  if (astNode.body) {
+    elLayoutCounter.x += H_SPACING;
+    const bodyExit = processASTNode(astNode.body, whileId, baseY);
+    elLayoutCounter.x += H_SPACING;
+    return bodyExit || whileId;
+  }
+
+  elLayoutCounter.x += H_SPACING;
+  return whileId;
+}
+
+function processSimpleNode(astNode, fromId, baseY) {
+  const nodeId = createNode('normal', astNode.label, elLayoutCounter.x, baseY, '', astNode.dataRef || null);
+  if (Array.isArray(fromId)) {
+    fromId.forEach(fid => connect(fid, nodeId));
+  } else {
+    connect(fromId, nodeId);
+  }
+  elLayoutCounter.x += H_SPACING;
+  return nodeId;
+}
+
+// Append a chain AST to the current graph (does NOT clear existing nodes).
+// Returns the Y position for the next chain.
+function appendChainFromAST(ast, chainName = 'chain1', yOffset = 0) {
+  const baseY = 250 + yOffset;
+  elLayoutCounter = { x: 60, y: baseY };
+
+  // Start node - use chain name as label
+  const startLabel = chainName || 'chain1';
+  const startId = generateId();
+  state.nodes.push({ id: startId, type: 'start', label: startLabel, x: 50, y: baseY, expression: '' });
+
+  let body = ast;
+  if (ast.type === 'chain') body = ast.body;
+
+  if (body) {
+    const exitResult = processASTNode(body, startId, baseY);
+
+    // End node
+    if (exitResult) {
+      const endNodeId = generateId();
+      const endX = Math.max(elLayoutCounter.x + 140, 200);
+      state.nodes.push({ id: endNodeId, type: 'end', label: '结束', x: endX, y: baseY, expression: '' });
+      const exitIds = Array.isArray(exitResult) ? exitResult : [exitResult];
+      exitIds.forEach(eid => {
+        state.connections.push({ id: generateId(), from: eid, to: endNodeId });
+      });
+    }
+  }
+
+  // Return the max Y used by nodes in this chain, plus gap
+  let maxY = baseY;
+  state.nodes.forEach(n => { if (n.y > maxY) maxY = n.y; });
+  return maxY + 100;
+}
+
+// ----- XML Import -----
+function importXMLString(xmlStr) {
+  // Parse XML to extract EL expression
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xmlStr, 'text/xml');
+
+  // Check for parse error
+  const parseError = doc.querySelector('parsererror');
+  if (parseError) {
+    showToast('XML解析失败: ' + parseError.textContent);
+    return;
+  }
+
+  // Support both <flow><chain>...</chain></flow> and multiple <chain>...</chain> formats
+  const chainEls = doc.querySelectorAll('flow > chain, chain');
+  if (!chainEls || chainEls.length === 0) {
+    showToast('未找到 &lt;chain&gt; 元素');
+    return;
+  }
+
+  // Clear current canvas once
+  state.nodes = [];
+  state.connections = [];
+  state.selectedNodeId = null;
+  state.selectedConnectionId = null;
+  state.nextId = 1;
+  canvas.querySelectorAll('.canvas-node').forEach(el => el.remove());
+  svgLayer.innerHTML = '';
+
+  let yOffset = 0;
+  let totalNodes = 0;
+
+  chainEls.forEach(chainEl => {
+    const chainName = chainEl.getAttribute('name') || 'chain1';
+    let elExpr = chainEl.textContent.trim();
+
+    // Extract data assignments: cmpData = '...' or cmpDataN = '...'
+    _importDataVars = {};
+    elExpr = elExpr.replace(/^(\s*cmpData\d*\s*=\s*'((?:[^'\\]|\\.)*)'\s*;\s*)+/gm, (match) => {
+      // Match individual assignments
+      const assignRe = /cmpData(\d*)\s*=\s*'((?:[^'\\]|\\.)*)'/g;
+      let m;
+      while ((m = assignRe.exec(match)) !== null) {
+        const varName = 'cmpData' + (m[1] || '');
+        // Unescape: \\ -> \, \' -> '
+        const dataJson = m[2].replace(/\\'/g, "'").replace(/\\\\/g, '\\');
+        _importDataVars[varName] = dataJson;
+      }
+      return ''; // Remove the assignments from the EL expression
+    });
+
+    // Remove trailing semicolon
+    elExpr = elExpr.replace(/;\s*$/, '');
+
+    if (!elExpr) {
+      // Empty chain - just add a start node
+      const startLabel = chainName || 'chain1';
+      const startId = generateId();
+      state.nodes.push({ id: startId, type: 'start', label: startLabel, x: 50, y: 250 + yOffset, expression: '' });
+      yOffset += 100;
+      totalNodes++;
+      return;
+    }
+
+    try {
+      const ast = parseEL(elExpr);
+      if (!ast) {
+        console.warn('Skipping chain - EL表达式解析失败:', chainName);
+        return;
+      }
+
+      // Wrap in chain AST
+      const chainAST = ast.type === 'chain' ? ast : { type: 'chain', name: chainName, body: ast };
+
+      // Append chain to graph
+      const nextY = appendChainFromAST(chainAST, chainName, yOffset);
+      yOffset = nextY - 250; // Convert back to offset from base 250
+      totalNodes = state.nodes.length;
+    } catch (e) {
+      console.error('EL parse error:', e);
+      showToast('EL表达式解析错误: ' + e.message);
+    }
+  });
+
+  // Render
+  renderAllNodes();
+  updateXML();
+  updatePropertiesPanel(null);
+  updateMinimap();
+
+  showToast(`已导入 ${chainEls.length} 个chain (${totalNodes} 个节点)`);
+}
+
+// index.html?name=chain1	需要在服务器上运行.
+// ----- Auto-import from URL parameter -----
+function autoImportFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const name = params.get('name');
+  if (!name) return;
+
+  // Fetch the XML file
+  fetch(name + '.xml')
+    .then(response => {
+      if (!response.ok) throw new Error('文件未找到: ' + name + '.xml');
+      return response.text();
+    })
+    .then(xmlStr => {
+      importXMLString(xmlStr);
+    })
+    .catch(err => {
+      console.warn('自动导入失败:', err.message);
+      showToast('自动导入失败: ' + err.message);
+    });
+}
+
+// ----- Tab Switching -----
+(function initTabs() {
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const tabName = this.getAttribute('data-tab');
+      // Update active tab button
+      tabBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      // Update active tab content
+      document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+      const targetTab = document.getElementById(tabName === 'properties' ? 'tabProperties' : 'tabXml');
+      if (targetTab) targetTab.classList.add('active');
+    });
+  });
+})();
+
+// ----- Initialize -----
+renderAllNodes();
+updateXML();
+updateMinimap();
+
+// Initial minimap render after DOM ready
+setTimeout(updateMinimap, 100);
+
+// Auto-import from URL parameter (after a small delay to ensure DOM is ready)
+setTimeout(autoImportFromURL, 200);
+
+console.log('EL规则可视化设计器已就绪');
+</script>
+</body>
+</html>

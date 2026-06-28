@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSE客户端 - 实时消息接收</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+        
+        .connection-panel {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
+        label {
+            font-weight: 600;
+            color: #2c3e50;
+            min-width: 100px;
+        }
+        
+        input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        #toggleBtn {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        #toggleBtn.connected {
+            background-color: #e74c3c;
+        }
+        
+        #toggleBtn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+        
+        #toggleBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        #clearBtn {
+            background-color: #95a5a6;
+            color: white;
+        }
+        
+        #clearBtn:hover:not(:disabled) {
+            background-color: #7f8c8d;
+            transform: translateY(-2px);
+        }
+        
+        .status-panel {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 4px solid #9b59b6;
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .status-disconnected {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        
+        .status-connecting {
+            background-color: #fff3e0;
+            color: #ef6c00;
+        }
+        
+        .status-connected {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .status-text {
+            margin-left: 8px;
+        }
+        
+        .status-details {
+            background-color: white;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 14px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .messages-panel {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid #f39c12;
+        }
+        
+        .messages-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .messages-header h3 {
+            color: #2c3e50;
+        }
+        
+        #messageCount {
+            background-color: #3498db;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+        
+        #messagesContainer {
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: white;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        .message-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 8px;
+        }
+        
+        .message-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .message-time {
+            color: #7f8c8d;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+        
+        .message-content {
+            color: #2c3e50;
+            word-break: break-word;
+        }
+        
+        .event-type {
+            display: inline-block;
+            background-color: #e1f5fe;
+            color: #0277bd;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 8px;
+            font-weight: 600;
+        }
+        
+        .instructions {
+            background-color: #e8f4fc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .instructions h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .instructions code {
+            background-color: rgba(0, 0, 0, 0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            input {
+                width: 100%;
+                min-width: unset;
+            }
+            
+            .button-group {
+                width: 100%;
+            }
+            
+            button {
+                flex: 1;
+                min-width: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SSE客户端</h1>
+        <p class="subtitle">连接到Server-Sent Events (SSE)服务器并接收实时消息</p>
+        
+        <div class="connection-panel">
+            <h2>连接设置</h2>
+            <div class="input-group">
+                <label for="urlInput">SSE地址:</label>
+                <input type="text" id="urlInput" placeholder="请输入完整的SSE服务器地址" value="http://localhost:9040/api/connect/123">
+            </div>
+            
+            <div class="button-group">
+                <button id="toggleBtn">连接</button>
+                <button id="clearBtn">清空消息</button>
+            </div>
+        </div>
+        
+        <div class="status-panel">
+            <h2>连接状态</h2>
+            <div id="statusIndicator" class="status-indicator status-disconnected">
+                <div class="status-dot"></div>
+                <span class="status-text">未连接</span>
+            </div>
+            <div class="status-details" id="statusDetails">
+                准备连接...
+            </div>
+        </div>
+        
+        <div class="messages-panel">
+            <div class="messages-header">
+                <h3>接收到的消息</h3>
+                <div id="messageCount">0 条消息</div>
+            </div>
+            <div id="messagesContainer">
+                <div class="message-item">等待连接...</div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>使用说明</h3>
+            <ul>
+                <li>在"SSE地址"输入框中输入完整的SSE服务器地址</li>
+                <li>点击"连接"按钮建立到SSE服务器的连接</li>
+                <li>连接成功后，按钮将变为"断开连接"，点击可断开连接</li>
+                <li>连接建立后，服务器发送的消息将实时显示在消息区域</li>
+                <li>点击"清空消息"可以清除所有接收到的消息</li>
+                <li>SSE服务器端点格式示例: <code>http://localhost:9040/api/connect/123</code></li>
+                <li>此演示需要SSE服务器在指定地址可用</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取DOM元素
+            const urlInput = document.getElementById('urlInput');
+            const toggleBtn = document.getElementById('toggleBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const statusIndicator = document.getElementById('statusIndicator');
+            const statusDetails = document.getElementById('statusDetails');
+            const messagesContainer = document.getElementById('messagesContainer');
+            const messageCount = document.getElementById('messageCount');
+            
+            let eventSource = null;
+            let messageCounter = 0;
+            let isConnected = false;
+            
+            // 更新连接状态
+            function updateStatus(status, details) {
+                // 移除所有状态类
+                statusIndicator.classList.remove(
+                    'status-disconnected', 
+                    'status-connecting', 
+                    'status-connected'
+                );
+                
+                // 添加当前状态类
+                if (status === 'disconnected') {
+                    statusIndicator.classList.add('status-disconnected');
+                    statusIndicator.innerHTML = '<div class="status-dot"></div><span class="status-text">未连接</span>';
+                    toggleBtn.textContent = '连接';
+                    toggleBtn.classList.remove('connected');
+                    isConnected = false;
+                } else if (status === 'connecting') {
+                    statusIndicator.classList.add('status-connecting');
+                    statusIndicator.innerHTML = '<div class="status-dot"></div><span class="status-text">连接中...</span>';
+                    toggleBtn.textContent = '连接中...';
+                    toggleBtn.disabled = true;
+                } else if (status === 'connected') {
+                    statusIndicator.classList.add('status-connected');
+                    statusIndicator.innerHTML = '<div class="status-dot"></div><span class="status-text">已连接</span>';
+                    toggleBtn.textContent = '断开连接';
+                    toggleBtn.classList.add('connected');
+                    toggleBtn.disabled = false;
+                    isConnected = true;
+                }
+                
+                // 更新状态详情
+                if (details) {
+                    statusDetails.textContent = details;
+                }
+            }
+            
+            // 添加消息到消息容器
+            function addMessage(eventType, data) {
+                messageCounter++;
+                messageCount.textContent = `${messageCounter} 条消息`;
+                
+                const messageItem = document.createElement('div');
+                messageItem.className = 'message-item';
+                
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('zh-CN', { 
+                    hour12: false,
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                
+                messageItem.innerHTML = `
+                    <div class="message-time">${timeString} - 事件ID: ${messageCounter}</div>
+                    <div>
+                        <span class="event-type">${eventType}</span>
+                        <span class="message-content">${data}</span>
+                    </div>
+                `;
+                
+                messagesContainer.prepend(messageItem);
+                
+                // 限制消息数量，最多保留50条
+                const allMessages = messagesContainer.querySelectorAll('.message-item');
+                if (allMessages.length > 50) {
+                    allMessages[allMessages.length - 1].remove();
+                }
+            }
+            
+            // 连接到SSE服务器
+            function connectToSSE() {
+                const url = urlInput.value.trim();
+                
+                if (!url) {
+                    alert('请输入SSE服务器地址');
+                    urlInput.focus();
+                    return;
+                }
+                
+                updateStatus('connecting', `正在连接到: ${url}`);
+                
+                try {
+                    // 创建EventSource对象连接到SSE服务器
+                    eventSource = new EventSource(url);
+                    
+                    // 连接打开时的处理
+                    eventSource.onopen = function(event) {
+                        updateStatus('connected', `已成功连接到服务器 (${url})`);
+                        addMessage('连接状态', 'SSE连接已建立');
+                    };
+                    
+                    // 接收消息的处理
+                    eventSource.onmessage = function(event) {
+                        addMessage('消息', event.data);
+                    };
+                    
+                    // 处理自定义事件
+                    eventSource.addEventListener('update', function(event) {
+                        addMessage('更新事件', event.data);
+                    });
+                    
+                    eventSource.addEventListener('notification', function(event) {
+                        addMessage('通知事件', event.data);
+                    });
+                    
+                    // 连接错误的处理
+                    eventSource.onerror = function(event) {
+                        if (eventSource.readyState === EventSource.CLOSED) {
+                            updateStatus('disconnected', '连接已关闭');
+                            addMessage('连接状态', 'SSE连接已关闭');
+                        } else {
+                            updateStatus('disconnected', '连接错误，正在尝试重连...');
+                            addMessage('错误', 'SSE连接错误');
+                        }
+                    };
+                    
+                } catch (error) {
+                    updateStatus('disconnected', `连接错误: ${error.message}`);
+                    addMessage('错误', `无法建立SSE连接: ${error.message}`);
+                }
+            }
+            
+            // 断开SSE连接
+            function disconnectFromSSE() {
+                if (eventSource) {
+                    eventSource.close();
+                    eventSource = null;
+                    updateStatus('disconnected', '连接已手动断开');
+                    addMessage('连接状态', 'SSE连接已断开');
+                }
+            }
+            
+            // 切换连接状态
+            function toggleConnection() {
+                if (isConnected) {
+                    disconnectFromSSE();
+                } else {
+                    connectToSSE();
+                }
+            }
+            
+            // 清空消息
+            function clearMessages() {
+                messagesContainer.innerHTML = '<div class="message-item">消息已清空</div>';
+                messageCounter = 0;
+                messageCount.textContent = '0 条消息';
+            }
+            
+            // 绑定按钮事件
+            toggleBtn.addEventListener('click', toggleConnection);
+            clearBtn.addEventListener('click', clearMessages);
+            
+            // 初始状态
+            updateStatus('disconnected', '准备连接...');
+            
+            // 模拟接收消息的示例（仅用于演示）
+            function simulateMessages() {
+                // 只有在未连接时模拟消息
+                if (!eventSource) {
+                    const events = ['系统通知', '用户更新', '数据同步', '提醒消息'];
+                    const messages = [
+                        '欢迎使用SSE客户端演示',
+                        '输入SSE服务器地址并点击"连接"按钮',
+                        'SSE连接将保持打开状态，允许服务器实时推送消息',
+                        '连接成功后，按钮将变为"断开连接"',
+                        '您可以手动输入不同的SSE地址进行测试'
+                    ];
+                    
+                    // 每10秒添加一条模拟消息（仅用于演示）
+                    setInterval(() => {
+                        if (!eventSource && messagesContainer.children.length < 3) {
+                            const randomEvent = events[Math.floor(Math.random() * events.length)];
+                            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                            addMessage(`模拟: ${randomEvent}`, randomMessage);
+                        }
+                    }, 10000);
+                }
+            }
+            
+            // 启动模拟消息（仅用于演示）
+            simulateMessages();
+        });
+    </script>
+</body>
+</html>
